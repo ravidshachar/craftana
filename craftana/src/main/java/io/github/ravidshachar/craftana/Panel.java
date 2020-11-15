@@ -15,12 +15,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static io.github.ravidshachar.craftana.Constants.*;
+
 public class Panel {
 	private String socketPair; //the prometheus socket pair
 	private String query;
 	
 	public Panel(String socketPair, String query) {
-		this.socketPair = String.format("http://%s/api/v1", socketPair);
+		//this.socketPair = String.format("http://%s/api/v1", socketPair);
 		this.socketPair = socketPair;
 		this.query = query;
 	}
@@ -30,11 +32,10 @@ public class Panel {
 	}
 	
 	/**
-	 * This function receives a query string as a parameter and return the first value found in the 
+	 * This function uses the query string attribute and return the first value found in the 
 	 * RESTAPI response
 	 */
 	public String Query() throws IOException, JSONException {
-		Bukkit.getLogger().info(formatURL().toString());
 		JSONObject json = readJsonFromUrl(formatURL());
 		if (!json.getString("status").equals("success")) {
 			return "status: " + json.getString("status") + "\n" + Boolean.toString(json.getString("status").equals("success"));
@@ -44,6 +45,38 @@ public class Panel {
 			return "result: " + result.toString();
 		}
 		return result.getJSONObject(0).getJSONArray("value").getString(1);
+	}
+	
+	
+	/**
+	 * This function receives duration in seconds and step and returns
+	 * the query range from [duration] time ago until now
+	 */
+	public String[] RangeQuery(int step) throws IOException, JSONException {
+		return RangeQuery(Long.toString(System.currentTimeMillis() / 1000L - steps * step), Long.toString(System.currentTimeMillis() / 1000L), step + "s");
+	}
+	
+	/**
+	 * This function receives start and end timestamps and
+	 * returns the query range as an array
+	 */
+	public String[] RangeQuery(String start, String end, String step) throws IOException, JSONException {
+		JSONObject json = readJsonFromUrl(formatURL(start, end, step));
+		if (!json.getString("status").equals("success")) {
+			Bukkit.getLogger().info("status: " + json.getString("status") + "\n" + Boolean.toString(json.getString("status").equals("success")));
+			return null;
+		}
+		JSONArray result = json.getJSONObject("data").getJSONArray("result");
+		if (result == null || result.length() == 0) {
+			Bukkit.getLogger().info("result: " + result.toString());
+			return null;
+		}
+		JSONArray values = result.getJSONObject(0).getJSONArray("values");
+		String[] values_strings = new String[values.length()];
+		for (int i = 0; i < values.length(); i++) {
+			values_strings[i] = values.getJSONArray(i).getString(1);
+		}
+		return values_strings;
 	}
 	
 	/**
@@ -86,6 +119,29 @@ public class Panel {
 						   socketPair.substring(0, socketPair.indexOf(":")), 
 						   Integer.parseInt(socketPair.substring(socketPair.indexOf(":") + 1, socketPair.length())), 
 						   "/api/v1/query?query=" + URLEncoder.encode(query, StandardCharsets.UTF_8.toString())
+						  );
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return null;
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	/**
+	 * same as format URL but for range_queries with time in format <YYYY>-<MM>-<DD>T<HH>:<mm>:<ss>Z or as timestamp
+	 */
+	private URL formatURL(String start, String end, String step) {
+		try {
+			//return new URL(String.format("http://%s/api/v1/query?query=", socketPair) + URLEncoder.encode(query, StandardCharsets.UTF_8.toString()));
+			return new URL("http", 
+						   socketPair.substring(0, socketPair.indexOf(":")), 
+						   Integer.parseInt(socketPair.substring(socketPair.indexOf(":") + 1, socketPair.length())), 
+						   "/api/v1/query_range?query=" + URLEncoder.encode(query, StandardCharsets.UTF_8.toString()) + 
+						   "&start=" + start +
+						   "&end=" + end +
+						   "&step=" + URLEncoder.encode(step, StandardCharsets.UTF_8.toString())
 						  );
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();

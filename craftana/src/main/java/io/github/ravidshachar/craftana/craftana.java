@@ -14,10 +14,9 @@ public final class craftana extends JavaPlugin {
     public void onEnable() {
     	final CraftanaCommandExecutor commandExecutor = new CraftanaCommandExecutor(this);
     	getLogger().info("onEnable has been invoked!");
-    	//this.getCommand("percent").setExecutor(commandExecutor);
-    	//this.getCommand("getmetric").setExecutor(commandExecutor);
     	this.getCommand("setclock").setExecutor(commandExecutor);
     	this.getCommand("cleardashboard").setExecutor(commandExecutor);
+    	this.getCommand("setgraph").setExecutor(commandExecutor);
     	clearAll(commandExecutor);
     	BukkitScheduler scheduler = getServer().getScheduler();
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
@@ -39,10 +38,12 @@ public final class craftana extends JavaPlugin {
     
     public void updateAll(CraftanaCommandExecutor commandExecutor) throws NumberFormatException, JSONException, IOException {
     	commandExecutor.clockDashboard.updateDashboard();
+    	commandExecutor.graphDashboard.updateDashboard();
     }
     
     public void clearAll(CraftanaCommandExecutor commandExecutor) {
     	commandExecutor.clockDashboard.clearDashboard();
+    	commandExecutor.graphDashboard.clearDashboard();
     	getLogger().info("All clear!");
     }
 }

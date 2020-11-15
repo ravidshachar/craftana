@@ -27,11 +27,15 @@ public final class Clock extends Panel {
 		this.isX = isX;
 	}
 	
-	public boolean percent(int perc) {
-		if (perc > 100)
-			return percent(100);
-		if (perc < 0)
-			return percent(0);
+	public void percent(int perc) {
+		if (perc > 100) {
+			percent(100);
+			return;
+		}
+		if (perc < 0) {
+			percent(0);
+			return;
+		}
 		double radians = Math.PI * perc / 100;
 		Vector dist;
 		Vector startpoint = leftCoords; //cords for the arrow startpoint for calculation
@@ -47,14 +51,11 @@ public final class Clock extends Panel {
 		else
 			dist = new Vector(0, (int)Math.round(radius*Math.sin(radians)), -1 * (int)Math.round(radius*Math.cos(radians)));
 		endpoint = startpoint.add(dist);
-		//plugin.getLogger().info("startpoint: " + startpoint);
-		//plugin.getLogger().info("endpoint: " + endpoint);
 		drawLine(leftCoords, endpoint, Material.GLASS);
 		if (perc == 50)
 			drawLine(leftCoords.add(1, 0, 0), endpoint.add(1, 0, 0), Material.GLASS);
 		else
 			drawLine(leftCoords.add(1, 0, 0), endpoint, Material.GLASS);
-		return true;
 	}
 	
 	/**
@@ -92,9 +93,9 @@ public final class Clock extends Panel {
 	 * @throws JSONException 
 	 * @throws NumberFormatException 
 	 */
-	public void displayQuery(int diffV, Boolean isDiffX) throws NumberFormatException, JSONException, IOException {
+	public void displayQuery(int diffV) throws NumberFormatException, JSONException, IOException {
 		percent((int) (100 * Double.parseDouble(this.Query()) / threshold));
-		BlockString bs = new BlockString(this.Query(), leftCoords, diffV, isDiffX);
+		BlockString bs = new BlockString(this.Query(), leftCoords, diffV, isX);
 		bs.clearString();
 		bs.drawString();
 	}

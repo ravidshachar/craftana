@@ -11,7 +11,7 @@ import org.json.JSONException;
 //import static io.github.ravidshachar.craftana.Constants.*;
 
 
-public class Dashboard {
+public class ClockDashboard {
 	Plugin plugin;
 	HashMap<String, Clock> clocks; // String clockID : Clock clockObject
 	int diffH;
@@ -19,7 +19,7 @@ public class Dashboard {
 	Boolean isDiffX;
 	Vector firstCoords;
 	
-	public Dashboard(Plugin plugin, Vector firstCoords, int diffH, int diffV, Boolean isDiffX) {
+	public ClockDashboard(Plugin plugin, Vector firstCoords, int diffH, int diffV, Boolean isDiffX) {
 		this.plugin = plugin;
 		clocks = new HashMap<String, Clock>();
 		this.firstCoords = firstCoords;
@@ -54,16 +54,11 @@ public class Dashboard {
 	
 	public void updateDashboard() throws NumberFormatException, JSONException, IOException {
 		for (Clock clock : clocks.values()) {
-			clock.displayQuery(diffV, isDiffX);
-			/*Vector bsStart = clock.leftCoords;
-			BlockString bs = new BlockString(clock.Query(), bsStart, diffV, isDiffX);
-			drawRect(bs.leftCorner,bs.leftCorner.add(isDiffX ? maxText : 0, 4, isDiffX ? 0 : maxText),Material.AIR);
-			bs.drawString();*/
+			clock.displayQuery(diffV);
 		}
 	}
 	
 	public void clearDashboard() {
-		//Clock tempClock;
 		String clockID;
 		for (char i='A'; i <= 'E';i++) {
 			for (char j='1'; j <= '3';j++) {
@@ -71,8 +66,6 @@ public class Dashboard {
 				removeClock(clockID);
 				plugin.getLogger().info(clockID);
 				plugin.getLogger().info(getLeftCoords(clockID).toString());
-				//tempClock = new Clock(plugin, firstCoords.add(getLeftCoords(clockID)), "", "", 100, isDiffX);
-				//tempClock.clearClock();
 			}
 		}
 	}

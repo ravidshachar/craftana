@@ -61,6 +61,13 @@ services:
     deploy:
       mode: global
 
+  craftana:
+    image: craftana:0.0.1
+    ports:
+      - 25565:25565
+    networks:
+      - back_tier
+
 #  alertmanager:
 #    image: prom/alertmanager
 #    ports:
@@ -92,24 +99,24 @@ services:
 #    deploy:
 #      mode: global
 
-  grafana:
-    image: grafana/grafana
-    user: "472"
-    depends_on:
-      - prometheus
-    ports:
-      - 3000:3000
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./grafana/provisioning/:/etc/grafana/provisioning/
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
-    env_file:
-      - ./grafana/config.monitoring
-    networks:
-      - back-tier
-      - front-tier
-    restart: always
+#  grafana:
+#    image: grafana/grafana
+#    user: "472"
+#    depends_on:
+#      - prometheus
+#    ports:
+#      - 3000:3000
+#    volumes:
+#      - grafana_data:/var/lib/grafana
+#      - ./grafana/provisioning/:/etc/grafana/provisioning/
+#      - "/etc/timezone:/etc/timezone:ro"
+#      - "/etc/localtime:/etc/localtime:ro"
+#    env_file:
+#      - ./grafana/config.monitoring
+#    networks:
+#      - back-tier
+#      - front-tier
+#    restart: always
 
 #  pushgateway:
 #    image: prom/pushgateway
