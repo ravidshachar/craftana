@@ -14,8 +14,8 @@ public final class craftana extends JavaPlugin {
     public void onEnable() {
     	final CraftanaCommandExecutor commandExecutor = new CraftanaCommandExecutor(this);
     	getLogger().info("onEnable has been invoked!");
-    	this.getCommand("percent").setExecutor(commandExecutor);
-    	this.getCommand("getmetric").setExecutor(commandExecutor);
+    	//this.getCommand("percent").setExecutor(commandExecutor);
+    	//this.getCommand("getmetric").setExecutor(commandExecutor);
     	this.getCommand("setclock").setExecutor(commandExecutor);
     	this.getCommand("cleardashboard").setExecutor(commandExecutor);
     	clearAll(commandExecutor);

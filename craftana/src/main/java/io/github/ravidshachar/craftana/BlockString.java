@@ -11,7 +11,7 @@ import static io.github.ravidshachar.craftana.Methods.*;
 import java.text.DecimalFormat;
 
 /**
- * Physical representaion of a character in Minecraft
+ * Physical representaion of a string in Minecraft
  */
 public class BlockString {
 	String str; //the string to be displayed
@@ -91,7 +91,7 @@ public class BlockString {
 	}
 	
 	public void clearString() {
-		
+		drawRect(this.leftCorner,this.leftCorner.add(isX ? diffV : 0, 4, isX ? 0 : diffV),Material.AIR);
 	}
 	
 	public void drawString() {

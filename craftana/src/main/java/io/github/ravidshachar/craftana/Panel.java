@@ -20,7 +20,7 @@ public class Panel {
 	private String query;
 	
 	public Panel(String socketPair, String query) {
-		//this.socketPair = String.format("http://%s/api/v1", socketPair);
+		this.socketPair = String.format("http://%s/api/v1", socketPair);
 		this.socketPair = socketPair;
 		this.query = query;
 	}

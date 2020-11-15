@@ -1,6 +1,5 @@
 package io.github.ravidshachar.craftana;
 
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.CommandExecutor;
@@ -55,7 +54,7 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 					return false;
 				}
 				return percent(perc);*/
-			case "getmetric":
+			//case "getmetric":
 				// The query may have spaces in it which will be different arguments, this part basically ensures it is all
 				// cluttered together to one string
 				/*StringBuilder message = new StringBuilder(args[0]);
@@ -96,120 +95,14 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 				StringBuilder query = new StringBuilder(args[3]);
 				for (int arg = 4; arg < args.length; arg++)
 					query.append(" ").append(args[arg]);
-				return setClock(args[0], args[1], threshold, query.toString());
+				return setClock(args[0], args[1], threshold, query.toString(), sender);
 			case "cleardashboard":
 				clockDashboard.clearDashboard();
 				return true;
-				
 		}
 		return false;
 	}
 	
-	/**
-	 * This command tests percent on clock algorithm
-	 */
-	/*public boolean percent(int perc) {
-		double radians = Math.PI * perc / 100;
-		Vector startpoint = leftCoords; //cords for the arrow startpoint for calculation
-		if (endpoint != null) {
-			clearLast(leftCoords);
-		}
-		endpoint = new Vector(); //coords for the arrow endpoint
-		if (perc > 50) {
-			startpoint = startpoint.add(new Vector(1, 0, 0));
-		}
-		Vector dist = new Vector(-1 * (int)Math.round(radius*Math.cos(radians)), (int)Math.round(radius*Math.sin(radians)), 0);
-		endpoint = startpoint.add(dist);
-		plugin.getLogger().info("startpoint: " + startpoint);
-		plugin.getLogger().info("endpoint: " + endpoint);
-		drawLine(leftCoords, endpoint, Material.GLASS);
-		if (perc == 50)
-			drawLine(leftCoords.add(new Vector(1, 0, 0)), endpoint.add(new Vector(1, 0, 0)), Material.GLASS);
-		else
-			drawLine(leftCoords.add(new Vector(1, 0, 0)), endpoint, Material.GLASS);
-		return true;
-	}*/
-	
-	/**
-	 * This method clears the last line made, assuming it was drawn in the current session
-	 */
-	/*public void clearLast(Vector leftCoords) {
-		drawLine(leftCoords, endpoint, Material.AIR);
-		drawLine(leftCoords.add(new Vector(1, 0, 0)), endpoint, Material.AIR);
-		drawLine(leftCoords.add(new Vector(1, 0, 0)), endpoint.add(new Vector(1, 0, 0)), Material.AIR);
-	}*/
-	
-	/**
-	 * This method clears the entire clock type panel
-	 */
-	/*public void clearClock(Vector leftCoords, int radius) {
-		Vector startpoint, dist, endpoint = new Vector();
-		double radians;
-		for (int i = 0; i <= 100; i+=2) {
-			startpoint = leftCoords;
-			radians = Math.PI * i / 100;
-			if (i > 50) {
-				startpoint = startpoint.add(new Vector(1, 0, 0));
-			}
-			dist = new Vector(-1 * (int)Math.round(radius*Math.cos(radians)), (int)Math.round(radius*Math.sin(radians)), 0);
-			endpoint = startpoint.add(dist);
-			drawLine(leftCoords, endpoint, Material.AIR);
-			drawLine(leftCoords.add(new Vector(1, 0, 0)), endpoint, Material.AIR);
-		}
-		drawLine(leftCoords.add(new Vector(1, 0, 0)), endpoint.add(new Vector(1, 0, 0)), Material.AIR);
-	}*/
-	
-	/**
-	 * This method draws a line from 2 Vectors
-	 */
-	/*public void drawLine(Vector startpoint, Vector endpoint, Material mat) {
-		int x1 = startpoint.getX();
-        int y1 = startpoint.getY();
-        int z1 = startpoint.getZ();
-        int x2 = endpoint.getX();
-        int y2 = endpoint.getY();
-        int z2 = endpoint.getZ();
-        int tipx = x1;
-        int tipy = y1;
-        int tipz = z1;
-        int dx = Math.abs(x2 - x1);
-        int dy = Math.abs(y2 - y1);
-        int dz = Math.abs(z2 - z1);
-
-        int dMax = Math.max(Math.max(dx, dy), dz);
-        if (dMax == dx) {
-        	//plugin.getLogger().info("dx");
-            for (int domstep = 0; domstep <= dx; domstep++) {
-                tipx = x1 + domstep * (x2 - x1 > 0 ? 1 : -1);
-                tipy = (int) Math.round(y1 + domstep * ((double) dy) / ((double) dx) * (y2 - y1 > 0 ? 1 : -1));
-                tipz = (int) Math.round(z1 + domstep * ((double) dz) / ((double) dx) * (z2 - z1 > 0 ? 1 : -1));
-                //plugin.getLogger().info((new Vector(tipx, tipy, tipz)).toString());
-                Block b = (new Location(Bukkit.getServer().getWorld("world"), tipx, tipy, tipz)).getBlock();
-                b.setType(mat);
-            }
-        } else if (dMax == dy) {
-        	//plugin.getLogger().info("dy");
-            for (int domstep = 0; domstep <= dy; domstep++) {
-                tipy = y1 + domstep * (y2 - y1 > 0 ? 1 : -1);
-                tipx = (int) Math.round(x1 + domstep * ((double) dx) / ((double) dy) * (x2 - x1 > 0 ? 1 : -1));
-                tipz = (int) Math.round(z1 + domstep * ((double) dz) / ((double) dy) * (z2 - z1 > 0 ? 1 : -1));
-                //plugin.getLogger().info((new Vector(tipx, tipy, tipz)).toString());
-                Block b = (new Location(Bukkit.getServer().getWorld("world"), tipx, tipy, tipz)).getBlock();
-                b.setType(mat);
-            }
-        } else if (dMax == dz) {
-        	//plugin.getLogger().info("dz");
-            for (int domstep = 0; domstep <= dz; domstep++) {
-                tipz = z1 + domstep * (z2 - z1 > 0 ? 1 : -1);
-                tipy = (int) Math.round(y1 + domstep * ((double) dy) / ((double) dz) * (y2 - y1 > 0 ? 1 : -1));
-                tipx = (int) Math.round(x1 + domstep * ((double) dx) / ((double) dz) * (x2 - x1 > 0 ? 1 : -1));
-                //plugin.getLogger().info((new Vector(tipx, tipy, tipz)).toString());
-                Block b = (new Location(Bukkit.getServer().getWorld("world"), tipx, tipy, tipz)).getBlock();
-                b.setType(mat);
-            }
-        }
-	}*/
-
 	/**
 	 * This method uses a custom query and returns the result from the prometheus host registered to the server as a broadcast
 	*/
@@ -225,10 +118,18 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 	/**
 	 * This method gets a query, socket pair and a threshold, as well as row and column and creates a new panel in game
 	 */
-	public boolean setClock(String clockID,String socketPair, double threshold, String query) {
+	public boolean setClock(String clockID,String socketPair, double threshold, String query, CommandSender sender) {
+		plugin.getLogger().info(socketPair);
 		clockDashboard.setClock(clockID, socketPair, query, threshold);
 		try {
 			plugin.updateAll(this);
+		}
+		catch (IOException e) {
+			plugin.getLogger().info(stackTraceToString(e));
+			plugin.getLogger().info("***HANDLED!***");
+			sender.sendMessage("Unknown Host " + socketPair);
+			clockDashboard.removeClock(clockID);
+			return false;
 		}
 		catch (Exception e) {
 			plugin.getLogger().info(stackTraceToString(e));

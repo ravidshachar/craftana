@@ -1,7 +1,7 @@
 package io.github.ravidshachar.craftana;
 
-import static io.github.ravidshachar.craftana.Constants.radius;
-import static io.github.ravidshachar.craftana.Methods.drawLine;
+import static io.github.ravidshachar.craftana.Constants.*;
+import static io.github.ravidshachar.craftana.Methods.*;
 
 import java.io.IOException;
 
@@ -47,8 +47,8 @@ public final class Clock extends Panel {
 		else
 			dist = new Vector(0, (int)Math.round(radius*Math.sin(radians)), -1 * (int)Math.round(radius*Math.cos(radians)));
 		endpoint = startpoint.add(dist);
-		plugin.getLogger().info("startpoint: " + startpoint);
-		plugin.getLogger().info("endpoint: " + endpoint);
+		//plugin.getLogger().info("startpoint: " + startpoint);
+		//plugin.getLogger().info("endpoint: " + endpoint);
 		drawLine(leftCoords, endpoint, Material.GLASS);
 		if (perc == 50)
 			drawLine(leftCoords.add(1, 0, 0), endpoint.add(1, 0, 0), Material.GLASS);
@@ -87,63 +87,15 @@ public final class Clock extends Panel {
 	}
 	
 	/**
-	 * This method draws a line from 2 Vectors
-	 */
-	/*public void drawLine(Vector startpoint, Vector endpoint, Material mat) {
-		int x1 = startpoint.getX();
-        int y1 = startpoint.getY();
-        int z1 = startpoint.getZ();
-        int x2 = endpoint.getX();
-        int y2 = endpoint.getY();
-        int z2 = endpoint.getZ();
-        int tipx = x1;
-        int tipy = y1;
-        int tipz = z1;
-        int dx = Math.abs(x2 - x1);
-        int dy = Math.abs(y2 - y1);
-        int dz = Math.abs(z2 - z1);
-
-        int dMax = Math.max(Math.max(dx, dy), dz);
-        if (dMax == dx) {
-        	//plugin.getLogger().info("dx");
-            for (int domstep = 0; domstep <= dx; domstep++) {
-                tipx = x1 + domstep * (x2 - x1 > 0 ? 1 : -1);
-                tipy = (int) Math.round(y1 + domstep * ((double) dy) / ((double) dx) * (y2 - y1 > 0 ? 1 : -1));
-                tipz = (int) Math.round(z1 + domstep * ((double) dz) / ((double) dx) * (z2 - z1 > 0 ? 1 : -1));
-                //plugin.getLogger().info((new Vector(tipx, tipy, tipz)).toString());
-                Block b = (new Location(Bukkit.getServer().getWorld("world"), tipx, tipy, tipz)).getBlock();
-                b.setType(mat);
-            }
-        } else if (dMax == dy) {
-        	//plugin.getLogger().info("dy");
-            for (int domstep = 0; domstep <= dy; domstep++) {
-                tipy = y1 + domstep * (y2 - y1 > 0 ? 1 : -1);
-                tipx = (int) Math.round(x1 + domstep * ((double) dx) / ((double) dy) * (x2 - x1 > 0 ? 1 : -1));
-                tipz = (int) Math.round(z1 + domstep * ((double) dz) / ((double) dy) * (z2 - z1 > 0 ? 1 : -1));
-                //plugin.getLogger().info((new Vector(tipx, tipy, tipz)).toString());
-                Block b = (new Location(Bukkit.getServer().getWorld("world"), tipx, tipy, tipz)).getBlock();
-                b.setType(mat);
-            }
-        } else if (dMax == dz) {
-        	//plugin.getLogger().info("dz");
-            for (int domstep = 0; domstep <= dz; domstep++) {
-                tipz = z1 + domstep * (z2 - z1 > 0 ? 1 : -1);
-                tipy = (int) Math.round(y1 + domstep * ((double) dy) / ((double) dz) * (y2 - y1 > 0 ? 1 : -1));
-                tipx = (int) Math.round(x1 + domstep * ((double) dx) / ((double) dz) * (x2 - x1 > 0 ? 1 : -1));
-                //plugin.getLogger().info((new Vector(tipx, tipy, tipz)).toString());
-                Block b = (new Location(Bukkit.getServer().getWorld("world"), tipx, tipy, tipz)).getBlock();
-                b.setType(mat);
-            }
-        }
-	}*/
-	
-	/**
 	 * TODO docs
 	 * @throws IOException 
 	 * @throws JSONException 
 	 * @throws NumberFormatException 
 	 */
-	public void displayQuery() throws NumberFormatException, JSONException, IOException {
+	public void displayQuery(int diffV, Boolean isDiffX) throws NumberFormatException, JSONException, IOException {
 		percent((int) (100 * Double.parseDouble(this.Query()) / threshold));
+		BlockString bs = new BlockString(this.Query(), leftCoords, diffV, isDiffX);
+		bs.clearString();
+		bs.drawString();
 	}
 }
