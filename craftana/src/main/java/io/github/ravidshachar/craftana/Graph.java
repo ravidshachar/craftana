@@ -24,7 +24,11 @@ public final class Graph extends Panel {
 	int step;
 	double threshold;
 	Boolean isX;
+	Boolean autoThreshold;
 	
+	/**
+	 * Constructor with static threshold
+	 */
 	public Graph(Plugin plugin, Vector leftCoords, String socketPair, String query, int step, double threshold, Boolean isX) {
 		super(socketPair, query);
 		this.plugin = plugin;
@@ -32,6 +36,20 @@ public final class Graph extends Panel {
 		this.step = step;
 		this.threshold = threshold;
 		this.isX = isX;
+		this.autoThreshold = false;
+	}
+	
+	/**
+	 * Constructor with auto threshold
+	 */
+	public Graph(Plugin plugin, Vector leftCoords, String socketPair, String query, int step, Boolean isX) {
+		super(socketPair, query);
+		this.plugin = plugin;
+		this.leftCoords = leftCoords;
+		this.step = step;
+		this.threshold = -1;
+		this.isX = isX;
+		this.autoThreshold = true;
 	}
 	
 	/**
@@ -106,6 +124,10 @@ public final class Graph extends Panel {
 	public void displayQuery() throws JSONException, IOException {
 		String[] values = this.RangeQuery(step);
 		int[] heights = new int[steps];
+		if (threshold == -1)
+			this.threshold = this.maxValue();
+		if (autoThreshold && Double.parseDouble(values[values.length - 1]) > threshold)
+			this.threshold = Double.parseDouble(values[values.length - 1]);
 		for (int i = 1; i <= steps; i++) {
 			// Going from the end to the beginning, if values has a value, divide it by the threshold and multiply by graphHeight
 			// to get proportional pillar height

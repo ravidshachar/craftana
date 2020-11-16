@@ -80,6 +80,20 @@ public class Panel {
 	}
 	
 	/**
+	 * this method returns the maximum value over the last 10 minutes
+	 * @throws IOException 
+	 * @throws JSONException 
+	 */
+	public double maxValue() throws JSONException, IOException {
+		String[] values = RangeQuery(Long.toString(System.currentTimeMillis() / 1000L - 600L), Long.toString(System.currentTimeMillis() / 1000L), "5s");
+		double max = 0;
+		for (int i = 0; i < values.length; i++) {
+			max = Math.max(max, Double.parseDouble(values[i]));
+		}
+		return max;
+	}
+	
+	/**
 	 * Helper method to readJsonFromUrl(), basically builds a string from the BufferedReader used in
 	 * readJsonFromUrl()
 	 */
@@ -115,11 +129,20 @@ public class Panel {
 	private URL formatURL() {
 		try {
 			//return new URL(String.format("http://%s/api/v1/query?query=", socketPair) + URLEncoder.encode(query, StandardCharsets.UTF_8.toString()));
-			return new URL("http", 
-						   socketPair.substring(0, socketPair.indexOf(":")), 
-						   Integer.parseInt(socketPair.substring(socketPair.indexOf(":") + 1, socketPair.length())), 
-						   "/api/v1/query?query=" + URLEncoder.encode(query, StandardCharsets.UTF_8.toString())
-						  );
+			if (socketPair.indexOf(":") > 0) {
+				return new URL("http", 
+						   	   socketPair.substring(0, socketPair.indexOf(":")), 
+						   	   Integer.parseInt(socketPair.substring(socketPair.indexOf(":") + 1, socketPair.length())), 
+						   	   "/api/v1/query?query=" + URLEncoder.encode(query, StandardCharsets.UTF_8.toString())
+						  	  );
+			}
+			else {
+				return new URL("http", 
+					   	   socketPair, 
+					   	   9090, 
+					   	   "/api/v1/query?query=" + URLEncoder.encode(query, StandardCharsets.UTF_8.toString())
+					  	  );
+			}
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 			return null;
@@ -135,14 +158,26 @@ public class Panel {
 	private URL formatURL(String start, String end, String step) {
 		try {
 			//return new URL(String.format("http://%s/api/v1/query?query=", socketPair) + URLEncoder.encode(query, StandardCharsets.UTF_8.toString()));
-			return new URL("http", 
-						   socketPair.substring(0, socketPair.indexOf(":")), 
-						   Integer.parseInt(socketPair.substring(socketPair.indexOf(":") + 1, socketPair.length())), 
-						   "/api/v1/query_range?query=" + URLEncoder.encode(query, StandardCharsets.UTF_8.toString()) + 
-						   "&start=" + start +
-						   "&end=" + end +
-						   "&step=" + URLEncoder.encode(step, StandardCharsets.UTF_8.toString())
-						  );
+			if (socketPair.indexOf(":") > 0) {
+				return new URL("http", 
+						   	   socketPair.substring(0, socketPair.indexOf(":")), 
+						       Integer.parseInt(socketPair.substring(socketPair.indexOf(":") + 1, socketPair.length())), 
+						       "/api/v1/query_range?query=" + URLEncoder.encode(query, StandardCharsets.UTF_8.toString()) + 
+						       "&start=" + start +
+						       "&end=" + end +
+						       "&step=" + URLEncoder.encode(step, StandardCharsets.UTF_8.toString())
+						      );
+			}
+			else {
+				return new URL("http",
+						socketPair,
+						9090,
+						"/api/v1/query_range?query=" + URLEncoder.encode(query, StandardCharsets.UTF_8.toString()) + 
+						"&start=" + start +
+						"&end=" + end +
+						"&step=" + URLEncoder.encode(step, StandardCharsets.UTF_8.toString())
+						);
+			}
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 			return null;

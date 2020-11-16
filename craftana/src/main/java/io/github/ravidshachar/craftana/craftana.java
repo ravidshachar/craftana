@@ -10,14 +10,15 @@ import java.io.IOException;
 
 public final class craftana extends JavaPlugin {
 	
+	final CraftanaCommandExecutor commandExecutor = new CraftanaCommandExecutor(this);
+	
     @Override
     public void onEnable() {
-    	final CraftanaCommandExecutor commandExecutor = new CraftanaCommandExecutor(this);
     	getLogger().info("onEnable has been invoked!");
     	this.getCommand("setclock").setExecutor(commandExecutor);
-    	this.getCommand("cleardashboard").setExecutor(commandExecutor);
     	this.getCommand("setgraph").setExecutor(commandExecutor);
-    	clearAll(commandExecutor);
+    	this.getCommand("cleardashboard").setExecutor(commandExecutor);
+    	this.getCommand("drawrect").setExecutor(commandExecutor); // DEV ONLY
     	BukkitScheduler scheduler = getServer().getScheduler();
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
@@ -34,6 +35,7 @@ public final class craftana extends JavaPlugin {
     @Override
     public void onDisable() {
     	getLogger().info("onDisable has been invoked!");
+    	clearAll(commandExecutor);
     }
     
     public void updateAll(CraftanaCommandExecutor commandExecutor) throws NumberFormatException, JSONException, IOException {

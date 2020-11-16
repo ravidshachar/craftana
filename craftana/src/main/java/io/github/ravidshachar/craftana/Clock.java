@@ -18,13 +18,32 @@ public final class Clock extends Panel {
 	public Plugin plugin;
 	double threshold;
 	Boolean isX; // if true, the clock is set horizontally to the X axis, if false it is set to the Z axis
+	Boolean autoThreshold;
 	
+	/**
+	 * constructor for a static threshold given by the player
+	 */
 	public Clock(Plugin plugin, Vector leftCoords, String socketPair, String query, double threshold, Boolean isX) {
 		super(socketPair, query);
 		this.plugin = plugin;
 		this.leftCoords = leftCoords;
 		this.threshold = threshold;
 		this.isX = isX;
+		this.autoThreshold = false;
+	}
+	
+	/**
+	 * constructor for a dynamic threshold (auto)
+	 * @throws IOException 
+	 * @throws JSONException 
+	 */
+	public Clock(Plugin plugin, Vector leftCoords, String socketPair, String query, Boolean isX) {
+		super(socketPair, query);
+		this.plugin = plugin;
+		this.leftCoords = leftCoords;
+		this.threshold = -1;
+		this.isX = isX;
+		this.autoThreshold = true;
 	}
 	
 	public void percent(int perc) {
@@ -94,7 +113,12 @@ public final class Clock extends Panel {
 	 * @throws NumberFormatException 
 	 */
 	public void displayQuery(int diffV) throws NumberFormatException, JSONException, IOException {
-		percent((int) (100 * Double.parseDouble(this.Query()) / threshold));
+		double query = Double.parseDouble(this.Query());
+		if (threshold == -1)
+			threshold = this.maxValue();
+		if (autoThreshold && query > threshold)
+			this.threshold = query;
+		percent((int) (100 * query / threshold));
 		BlockString bs = new BlockString(this.Query(), leftCoords, diffV, isX);
 		bs.clearString();
 		bs.drawString();

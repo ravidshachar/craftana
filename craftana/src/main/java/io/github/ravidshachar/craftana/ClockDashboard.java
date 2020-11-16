@@ -14,8 +14,8 @@ import org.json.JSONException;
 public class ClockDashboard {
 	Plugin plugin;
 	HashMap<String, Clock> clocks; // String clockID : Clock clockObject
-	int diffH;
-	int diffV;
+	int diffH; // Horizontal difference between two clocks
+	int diffV; // Vertical difference between two clocks
 	Boolean isDiffX;
 	Vector firstCoords;
 	
@@ -31,6 +31,15 @@ public class ClockDashboard {
 	public void setClock(String clockID, String socketPair, String query, double threshold) {
 		Vector leftCoords = firstCoords.add(getLeftCoords(clockID));
 		clocks.put(clockID, new Clock(plugin, leftCoords, socketPair, query, threshold, isDiffX));
+		clocks.get(clockID).clearClock();
+	}
+	
+	/**
+	 * clock setter with auto threshold
+	 */
+	public void setClock(String clockID, String socketPair, String query) {
+		Vector leftCoords = firstCoords.add(getLeftCoords(clockID));
+		clocks.put(clockID, new Clock(plugin, leftCoords, socketPair, query, isDiffX));
 		clocks.get(clockID).clearClock();
 	}
 	
