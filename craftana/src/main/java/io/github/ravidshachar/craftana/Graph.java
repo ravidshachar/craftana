@@ -11,7 +11,6 @@ import static io.github.ravidshachar.craftana.Methods.*;
 
 import java.io.IOException;
 
-
 /**
  * 
  * @author ravid
@@ -25,6 +24,7 @@ public final class Graph extends Panel {
 	double threshold;
 	Boolean isX;
 	Boolean autoThreshold;
+	Long timestamp = -1L;
 	
 	/**
 	 * Constructor with static threshold
@@ -122,7 +122,13 @@ public final class Graph extends Panel {
 	 * @throws JSONException 
 	 */
 	public void displayQuery() throws JSONException, IOException {
-		String[] values = this.RangeQuery(step);
+		if (timestamp == -1) {
+			timestamp = System.currentTimeMillis() / 1000L;
+		}
+		while (System.currentTimeMillis() / 1000L - timestamp >= step) {
+			timestamp += step;
+		}
+		String[] values = this.RangeQuery(timestamp, step);
 		int[] heights = new int[steps];
 		if (threshold == -1)
 			this.threshold = this.maxValue();

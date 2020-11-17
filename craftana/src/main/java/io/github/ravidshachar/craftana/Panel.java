@@ -53,11 +53,19 @@ public class Panel {
 	
 	
 	/**
-	 * This function receives duration in seconds and step and returns
-	 * the query range from [duration] time ago until now
+	 * This function receives step and returns
+	 * the query range from steps * step time ago until now
 	 */
 	public String[] RangeQuery(int step) throws IOException, JSONException {
 		return RangeQuery(Long.toString(System.currentTimeMillis() / 1000L - steps * step), Long.toString(System.currentTimeMillis() / 1000L), step + "s");
+	}
+	
+	/**
+	 * This function receives step and end timestamp and returns
+	 * the query range from steps * step time ago until end timestamp
+	 */
+	public String[] RangeQuery(Long end, int step) throws IOException, JSONException {
+		return RangeQuery(Long.toString(end - (steps + 1) * step), Long.toString(end), step + "s");
 	}
 	
 	/**

@@ -21,6 +21,7 @@ public class Methods {
 		e.printStackTrace(pw);
 		return sw.toString();// stack trace as a string
 	}
+	
 	/**
 	 * This method draws a line from 2 Vectors
 	 */
@@ -71,6 +72,7 @@ public class Methods {
             }
         }
 	}
+	
 	public static void drawRect(Vector startpoint, Vector endpoint, Material mat) {
 		int lines = endpoint.getY() - startpoint.getY();
     	for (int i = 0; i <= lines; i++)
