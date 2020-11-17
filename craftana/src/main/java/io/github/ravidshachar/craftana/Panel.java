@@ -31,6 +31,10 @@ public class Panel {
 		return socketPair;
 	}
 	
+	public String getRawQuery() {
+		return query;
+	}
+	
 	/**
 	 * This function uses the query string attribute and return the first value found in the 
 	 * RESTAPI response

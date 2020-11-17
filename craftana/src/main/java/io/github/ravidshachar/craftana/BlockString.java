@@ -51,7 +51,6 @@ public class BlockString {
 	public String shorten(String s) {
 		double num = Double.parseDouble(s);
 		int factor = (String.valueOf((int) num)).length();
-		Bukkit.getLogger().info(String.valueOf(num) + ", " + String.valueOf(factor));
 		DecimalFormat df;
 		if (num < 1000) {
 			df = new DecimalFormat(repeat(factor, "0") + "." + repeat(4 - factor, "#"));

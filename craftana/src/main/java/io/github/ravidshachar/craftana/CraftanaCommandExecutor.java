@@ -5,10 +5,20 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.event.Listener;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import static io.github.ravidshachar.craftana.Constants.*;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import static io.github.ravidshachar.craftana.Methods.*;
 
@@ -31,11 +41,13 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		plugin.getLogger().info("Got to onCommand!");
 		switch (cmd.getName().toLowerCase()) {
+		
 			case "setclock":
 				if (args.length < 4) {
 					sender.sendMessage("Must have 4 arguments");
 					return false;
 				}
+				
 				if (args[0].length() != 2 || 
 					args[0].charAt(0) < 'A' || 
 					args[0].charAt(0) > 'E' ||
@@ -44,6 +56,7 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 						sender.sendMessage("clockID must be a letter (A-E) and a number(1-3) in that order");
 						return false;
 				}
+				
 				try {
 					if (!args[2].equalsIgnoreCase("auto"))
 						Double.parseDouble(args[2]);
@@ -52,25 +65,30 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 					sender.sendMessage("threshold must be auto or a number!");
 					return false;
 				}
+				
 				StringBuilder query = new StringBuilder(args[3]);
 				for (int arg = 4; arg < args.length; arg++)
 					query.append(" ").append(args[arg]);
 				if (args[2].equalsIgnoreCase("auto"))
 					return setClock(args[0], args[1], query.toString(), sender);
 				return setClock(args[0], args[1], Double.parseDouble(args[2]), query.toString(), sender);
+				
 			case "setgraph":
 				if (args.length < 5) {
 					sender.sendMessage("Must have 5 arguments");
 					return false;
 				}
+				
 				if (args[0].length() != 2 || 
 					args[0].charAt(0) < 'F' || 
 					args[0].charAt(0) > 'H' ||
 					args[0].charAt(1) < '1' ||
-					args[0].charAt(1) > '2') {
-						sender.sendMessage("clockID must be a letter (F-H) and a number(1-2) in that order");
+					args[0].charAt(1) > '2') 
+				{
+						sender.sendMessage("graphID must be a letter (F-H) and a number(1-2) in that order");
 						return false;
-					}
+				}
+				
 				try {
 					Integer.parseInt(args[2]);
 				}
@@ -78,6 +96,7 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 					sender.sendMessage("step must be a number!");
 					return false;
 				}
+				
 				try {
 					if (!args[3].equalsIgnoreCase("auto"))
 						Double.parseDouble(args[3]);
@@ -86,6 +105,7 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 					sender.sendMessage("threshold must be auto or a number!");
 					return false;
 				}
+				
 				int step = Integer.parseInt(args[2]);
 				StringBuilder graph_query = new StringBuilder(args[4]);
 				for (int arg = 5; arg < args.length; arg++)
@@ -93,10 +113,32 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 				if (args[3].equalsIgnoreCase("auto"))
 					return setGraph(args[0], args[1], step, graph_query.toString(), sender);
 				return setGraph(args[0], args[1], step, Double.parseDouble(args[3]), graph_query.toString(), sender);
+				
 			case "cleardashboard":
 				clockDashboard.clearDashboard();
 				graphDashboard.clearDashboard();
 				return true;
+				
+			case "import":
+				if (args.length != 1) {
+					sender.sendMessage("Must have 1 path argument");
+					return false;
+				}
+				
+				try {
+					if (!importFile(args[0], sender)) {
+						sender.sendMessage("No changes made");
+						return false;
+					}
+				} 
+				catch (FileNotFoundException e) {
+					sender.sendMessage("No such file: " + args[0]);
+					return false;
+				}
+				
+				sender.sendMessage("Changes made!");
+				return true;
+				
 			case "drawrect":
 				if (args.length != 6) {
 					sender.sendMessage("must have 6 args");
@@ -106,6 +148,22 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 						 new Vector(Integer.parseInt(args[3]), Integer.parseInt(args[4]), Integer.parseInt(args[5])), 
 						 Material.BLACK_CONCRETE);
 				return true;
+				
+			case "export":
+				if (args.length != 1) {
+					sender.sendMessage("Must have 1 path argument");
+					return false;
+				}
+				try {
+					exportFile(args[0]);
+					sender.sendMessage("Successfuly exported!");
+					return true;
+				}
+				catch (IOException e) {
+					sender.sendMessage("Something went wrong! check server console!");
+					plugin.getLogger().info(stackTraceToString(e));
+					return false;
+				}
 		}
 		return false;
 	}
@@ -115,6 +173,7 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 	 */
 	public boolean setClock(String clockID,String socketPair, double threshold, String query, CommandSender sender) {
 		clockDashboard.setClock(clockID, socketPair, query, threshold);
+		
 		try {
 			plugin.updateAll(this);
 		}
@@ -129,6 +188,7 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 			plugin.getLogger().info(stackTraceToString(e));
 			return false;
 		}
+		
 		return true;
 	}
 	
@@ -137,6 +197,7 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 	 */
 	public boolean setClock(String clockID, String socketPair, String query, CommandSender sender) {
 		clockDashboard.setClock(clockID, socketPair, query);
+		
 		try {
 			plugin.updateAll(this);
 		}
@@ -151,6 +212,7 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 			plugin.getLogger().info(stackTraceToString(e));
 			return false;
 		}
+		
 		return true;
 	}
 	
@@ -159,6 +221,7 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 	 */
 	public boolean setGraph(String graphID, String socketPair, int step, double threshold, String query, CommandSender sender) {
 		graphDashboard.setGraph(graphID, socketPair, query, step, threshold);
+		
 		try {
 			plugin.updateAll(this);
 		}
@@ -173,6 +236,7 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 			plugin.getLogger().info(stackTraceToString(e));
 			return false;
 		}
+		
 		return true;
 	}
 	
@@ -181,6 +245,7 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 	 */
 	public boolean setGraph(String graphID, String socketPair, int step, String query, CommandSender sender) {
 		graphDashboard.setGraph(graphID, socketPair, query, step);
+		
 		try {
 			plugin.updateAll(this);
 		}
@@ -195,6 +260,117 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 			plugin.getLogger().info(stackTraceToString(e));
 			return false;
 		}
+		
 		return true;
+	}
+	
+	/**
+	 * import JSON config file, if at least 1 change was made return true
+	 */
+	public boolean importFile(String path, CommandSender sender) throws FileNotFoundException {
+		boolean success;
+		boolean partialSuccess = false;
+		Scanner myReader = new Scanner(new File(path));
+		String jsonString = myReader.useDelimiter("\\Z").next(); //parse JSON file into string
+		myReader.close();
+		JSONObject obj;
+		
+		try {
+			obj = new JSONObject(jsonString);
+		}
+		catch (JSONException e) {
+			sender.sendMessage("Bad JSON file");
+			return false;
+		}
+		
+		JSONArray clocks = obj.getJSONObject("dashboards").getJSONArray("clocks");
+		JSONObject temp;
+		JSONArray graphs = obj.getJSONObject("dashboards").getJSONArray("graphs");
+		
+		for (int i = 0; i < clocks.length(); i++) {
+			temp = clocks.getJSONObject(i);
+			if (temp.get("threshold").equals("auto"))
+				success = setClock(temp.getString("clockID"), temp.getString("socketPair"), temp.getString("query"), sender);
+			else
+				success = setClock(temp.getString("clockID"), temp.getString("socketPair"), temp.getDouble("threshold"), temp.getString("query"), sender);
+			plugin.getLogger().info(temp.getString("clockID") + " " + String.valueOf(success));
+			partialSuccess = partialSuccess || success;
+		}
+		
+		for (int i = 0; i < graphs.length(); i++) {
+			temp = graphs.getJSONObject(i);
+			if (temp.get("threshold").equals("auto"))
+				success = setGraph(temp.getString("graphID"), temp.getString("socketPair"), temp.getInt("step"), temp.getString("query"), sender);
+			else
+				success = setGraph(temp.getString("graphID"), temp.getString("socketPair"), temp.getInt("step"), temp.getDouble("threshold"), temp.getString("query"), sender);
+			plugin.getLogger().info(temp.getString("graphID") + " " + String.valueOf(success));
+			partialSuccess = partialSuccess || success;
+		}
+		return partialSuccess;
+	}
+	
+	/**
+	 * export all current clocks and graphs to a JSON config file located in path
+	 * JSON should look like:
+	 * { 
+	 *     "dashboards":
+	 * 	   {
+	 * 			"clocks": 
+	 * 			[
+	 * 				{
+	 * 				"clockID": "XY",
+	 * 				"socketPair": "ipOrAddress:port",
+	 * 				"threshold": [double] x,
+	 * 				"query": "promQLQuery{}"
+	 * 				},
+	 * 				...
+	 * 			],
+	 * 			"graphs": 
+	 * 			[
+	 * 				{
+	 * 				"graphID": "XY",
+	 * 				"socketPair": "ipOrAddress:port",
+	 * 				"step": [int] timeInSeconds,
+	 * 				"threshold": [double] x,
+	 * 				"query": "promQLQuery{}"
+	 * 				},
+	 * 				...
+	 * 			]
+	 * 	   }
+	 * }
+	 */
+	public void exportFile(String path) throws IOException {
+		Map<String, Object> map = new HashMap<String, Object>(); // The complete JSON document
+		Map<String, Object> temp;
+		ArrayList<Object> clocks = new ArrayList<Object>();
+		ArrayList<Object> graphs = new ArrayList<Object>();
+		
+		for (String clockID : clockDashboard.clocks.keySet()) {
+			temp = new HashMap<String, Object>();
+			temp.put("clockID", clockID);
+			temp.put("socketPair", clockDashboard.clocks.get(clockID).getSocketPair());
+			temp.put("threshold", clockDashboard.clocks.get(clockID).threshold);
+			temp.put("query", clockDashboard.clocks.get(clockID).getRawQuery());
+			clocks.add(temp);
+		}
+		
+		for (String graphID : graphDashboard.graphs.keySet()) {
+			temp = new HashMap<String, Object>();
+			temp.put("graphID", graphID);
+			temp.put("socketPair", graphDashboard.graphs.get(graphID).getSocketPair());
+			temp.put("step", graphDashboard.graphs.get(graphID).step);
+			temp.put("threshold", graphDashboard.graphs.get(graphID).threshold);
+			temp.put("query", graphDashboard.graphs.get(graphID).getRawQuery());
+			graphs.add(temp);
+		}
+		
+		temp = new HashMap<String, Object>();
+		temp.put("clocks", clocks);
+		temp.put("graphs", graphs);
+		map.put("dashboards", temp);
+		String json = (new JSONObject(map)).toString();
+		FileWriter myWriter = new FileWriter(path);
+		myWriter.write(json);
+		myWriter.close();
 	}
 }

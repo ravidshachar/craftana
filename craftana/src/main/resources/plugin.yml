@@ -11,6 +11,12 @@ commands:
     cleardashboard:
         description: This command clears the clock dashboard
         usage: /cleardashboard
+    import:
+        description: This command imports a json config file
+        usage: /import [/path/to/file.json]
+    export:
+        description: This command exports a json config file
+        usage: /export [/path/to/file.json]
     drawrect:
         description: DEV ONLY draws a rect
         usage: /drawrect [x1] [y1] [z1] [x2] [y2] [z2]

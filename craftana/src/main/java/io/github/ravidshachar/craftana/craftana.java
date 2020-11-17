@@ -18,6 +18,8 @@ public final class craftana extends JavaPlugin {
     	this.getCommand("setclock").setExecutor(commandExecutor);
     	this.getCommand("setgraph").setExecutor(commandExecutor);
     	this.getCommand("cleardashboard").setExecutor(commandExecutor);
+    	this.getCommand("import").setExecutor(commandExecutor);
+    	this.getCommand("export").setExecutor(commandExecutor);
     	this.getCommand("drawrect").setExecutor(commandExecutor); // DEV ONLY
     	BukkitScheduler scheduler = getServer().getScheduler();
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
