@@ -16,4 +16,10 @@ Exporter:
 Craftana also exports some basic metrics such as:  
 * craftana_online_players - A gauge. Current amount of online players.  
 * craftana_clocks - A gauge. Current amount of clocks in the dashboard.  
-* craftana_graphs - A gauge. Current amount of graphs in the dashboard.
+* craftana_graphs - A gauge. Current amount of graphs in the dashboard.  
+  
+Docker:
+-------
+```
+docker run -it -p 25565:25565 -p 25566:25566 --name craftana_server ravidshachar/craftana:0.1.0
+```
