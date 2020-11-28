@@ -29,6 +29,9 @@ public class GraphDashboard {
 	 * graph setter with static threshold
 	 */
 	public void setGraph(String graphID, String socketPair, String query, int step, double threshold) {
+		if (graphs.get(graphID) == null) {
+			MCExporter.graphAmount.inc();
+		}
 		Vector leftCoords = firstCoords.add(getLeftCoords(graphID));
 		graphs.put(graphID, new Graph(plugin, leftCoords, socketPair, query, step, threshold, isX));
 		graphs.get(graphID).clearGraph();
@@ -38,6 +41,9 @@ public class GraphDashboard {
 	 * graph setter with auto threshold
 	 */
 	public void setGraph(String graphID, String socketPair, String query, int step) {
+		if (graphs.get(graphID) == null) {
+			MCExporter.graphAmount.inc();
+		}
 		Vector leftCoords = firstCoords.add(getLeftCoords(graphID));
 		graphs.put(graphID, new Graph(plugin, leftCoords, socketPair, query, step, isX));
 		graphs.get(graphID).clearGraph();
@@ -73,5 +79,6 @@ public class GraphDashboard {
 				removeGraph(graphID);
 			}
 		}
+		MCExporter.graphAmount.set(0);
 	}
 }

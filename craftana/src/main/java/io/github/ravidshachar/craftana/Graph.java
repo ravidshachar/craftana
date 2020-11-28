@@ -125,6 +125,11 @@ public final class Graph extends Panel {
 		if (timestamp == -1) {
 			timestamp = System.currentTimeMillis() / 1000L;
 		}
+		
+		// if the difference between the current time and timestamp has exceeded the step duration, add step duration to timestamp
+		// it is preferable to work like this and not with current time only because for any step duration that is different than
+		// the prometheus refresh rate you'll get graphs that are constantly changing completely as they'll grab different 
+		// timestamps each time
 		while (System.currentTimeMillis() / 1000L - timestamp >= step) {
 			timestamp += step;
 		}
@@ -138,7 +143,7 @@ public final class Graph extends Panel {
 			// Going from the end to the beginning, if values has a value, divide it by the threshold and multiply by graphHeight
 			// to get proportional pillar height
 			if (values.length - i >= 0)
-				heights[steps - i] = (int) (graphHeight * Double.parseDouble(values[values.length - i]) / threshold);
+				heights[steps - i] = Math.max((int) (graphHeight * Double.parseDouble(values[values.length - i]) / threshold), graphHeight);
 			else
 				heights[steps - i] = 0;
 		}

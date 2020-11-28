@@ -173,7 +173,6 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 	 */
 	public boolean setClock(String clockID,String socketPair, double threshold, String query, CommandSender sender) {
 		clockDashboard.setClock(clockID, socketPair, query, threshold);
-		
 		try {
 			plugin.updateAll(this);
 		}

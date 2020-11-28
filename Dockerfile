@@ -26,4 +26,5 @@ COPY world world
 
 # Start server
 EXPOSE 25565
+EXPOSE 25566
 CMD ./craftbukkit.sh 

@@ -29,6 +29,9 @@ public class ClockDashboard {
 	}
 	
 	public void setClock(String clockID, String socketPair, String query, double threshold) {
+		if (clocks.get(clockID) == null) {
+			MCExporter.clockAmount.inc();
+		}
 		Vector leftCoords = firstCoords.add(getLeftCoords(clockID));
 		clocks.put(clockID, new Clock(plugin, leftCoords, socketPair, query, threshold, isDiffX));
 		clocks.get(clockID).clearClock();
@@ -38,6 +41,9 @@ public class ClockDashboard {
 	 * clock setter with auto threshold
 	 */
 	public void setClock(String clockID, String socketPair, String query) {
+		if (clocks.get(clockID) == null) {
+			MCExporter.clockAmount.inc();
+		}
 		Vector leftCoords = firstCoords.add(getLeftCoords(clockID));
 		clocks.put(clockID, new Clock(plugin, leftCoords, socketPair, query, isDiffX));
 		clocks.get(clockID).clearClock();
@@ -77,5 +83,6 @@ public class ClockDashboard {
 				plugin.getLogger().info(getLeftCoords(clockID).toString());
 			}
 		}
+		MCExporter.clockAmount.set(0);
 	}
 }
