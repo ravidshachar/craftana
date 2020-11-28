@@ -5,11 +5,11 @@ This project makes metrics visualisation with prometheus possible in minecraft!
   
 Commands:  
 ---------
-* /setclock <Clock ID> <Prometheus address> <max value (can also be auto)> <PromQL Query>  
-* /setgraph <Graph ID> <Prometheus address> <step (seconds)> <max value (can also be auto)> <PromQL Query>  
+* /setclock \<Clock ID\> \<Prometheus address\> \<max value (can also be auto)\> \<PromQL Query\>  
+* /setgraph \<Graph ID\> \<Prometheus address\> \<step (seconds)\> \<max value (can also be auto)\> \<PromQL Query\>  
 * /cleardashboard  
-* /import <path e.g. /path/to/config/file.json>  
-* /export <path e.g. /path/to/config/file.json>  
+* /import \<path e.g. /path/to/config/file.json\>  
+* /export \<path e.g. /path/to/config/file.json\>  
   
 Exporter:  
 ---------
