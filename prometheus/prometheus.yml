@@ -9,7 +9,7 @@ scrape_configs:
       - targets: ['node-exporter:9100']
         labels:
           group: 'prometheus'
-      - targets: ['craftana_server:25566']
+      - targets: ['craftana:25566']
         labels:
           group: 'craftana'
 
