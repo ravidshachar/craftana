@@ -16,8 +16,8 @@ services:
     volumes:
       - ./prometheus/:/etc/prometheus/
       - prometheus_data:/prometheus
-      - "./timezone:/etc/timezone:ro"
-      - "/usr/share/zoneinfo/Asia/Istanbul:/etc/localtime:ro"
+#      - "./timezone:/etc/timezone:ro"
+#      - "/usr/share/zoneinfo/Asia/Istanbul:/etc/localtime:ro"
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -46,8 +46,8 @@ services:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /:/rootfs:ro
-      - "./timezone:/etc/timezone:ro"
-      - "/usr/share/zoneinfo/Asia/Istanbul:/etc/localtime:ro"
+#      - "./timezone:/etc/timezone:ro"
+#      - "/usr/share/zoneinfo/Asia/Istanbul:/etc/localtime:ro"
     command: 
       - '--path.procfs=/host/proc' 
       - '--path.sysfs=/host/sys'
@@ -65,8 +65,9 @@ services:
     image: craftana:0.0.1
     ports:
       - 25565:25565
+      - 25566:25566
     networks:
-      - back_tier
+      - back-tier
 
 #  alertmanager:
 #    image: prom/alertmanager
