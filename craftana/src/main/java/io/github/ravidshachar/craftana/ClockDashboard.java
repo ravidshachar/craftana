@@ -14,26 +14,26 @@ import org.json.JSONException;
 public class ClockDashboard {
 	Plugin plugin;
 	HashMap<String, Clock> clocks; // String clockID : Clock clockObject
-	int diffH; // Horizontal difference between two clocks
-	int diffV; // Vertical difference between two clocks
-	Boolean isDiffX;
+	int diffHorizontal; // Horizontal difference between two clocks
+	int diffVertical; // Vertical difference between two clocks
+	Boolean isX;
 	Vector firstCoords;
 	
 	public ClockDashboard(Plugin plugin, Vector firstCoords, int diffH, int diffV, Boolean isDiffX) {
 		this.plugin = plugin;
 		clocks = new HashMap<String, Clock>();
 		this.firstCoords = firstCoords;
-		this.diffH = diffH;
-		this.diffV = diffV;
-		this.isDiffX = isDiffX;
+		this.diffHorizontal = diffH;
+		this.diffVertical = diffV;
+		this.isX = isDiffX;
 	}
 	
-	public void setClock(String clockID, String socketPair, String query, double threshold) {
+	public void setClock(String clockID, String socketPair, String query, double maxValue) {
 		if (clocks.get(clockID) == null) {
 			MCExporter.clockAmount.inc();
 		}
 		Vector leftCoords = firstCoords.add(getLeftCoords(clockID));
-		clocks.put(clockID, new Clock(plugin, leftCoords, socketPair, query, threshold, isDiffX));
+		clocks.put(clockID, new Clock(plugin, leftCoords, socketPair, query, maxValue, isX));
 		clocks.get(clockID).clearClock();
 	}
 	
@@ -45,7 +45,7 @@ public class ClockDashboard {
 			MCExporter.clockAmount.inc();
 		}
 		Vector leftCoords = firstCoords.add(getLeftCoords(clockID));
-		clocks.put(clockID, new Clock(plugin, leftCoords, socketPair, query, isDiffX));
+		clocks.put(clockID, new Clock(plugin, leftCoords, socketPair, query, isX));
 		clocks.get(clockID).clearClock();
 	}
 	
@@ -54,28 +54,25 @@ public class ClockDashboard {
 			return;
 		Clock tempClock = clocks.remove(clockID);
 		tempClock.clearClock();
-		BlockString bs = new BlockString("0.000", tempClock.leftCoords, diffV, isDiffX);
+		BlockString bs = new BlockString("0.000", tempClock.leftCoords, diffVertical, isX);
 		bs.clearString();
 	}
 	
 	private Vector getLeftCoords(String clockID) {
 		char letter = clockID.charAt(0);
 		char number = clockID.charAt(1);
-		if (isDiffX)
-			return new Vector((letter - 'A') * diffH, -1 * (number - '1') * diffV, 0);
-		else
-			return new Vector(0, (number - '1') * diffV, -1 * (letter - 'A') * diffH);
+		return new Vector(isX ? (letter - 'E') * diffHorizontal : 0, -1 * (number - '1') * diffVertical, isX ? 0 : (letter - 'E') * diffHorizontal);
 	}
 	
 	public void updateDashboard() throws NumberFormatException, JSONException, IOException {
 		for (Clock clock : clocks.values()) {
-			clock.displayQuery(diffV);
+			clock.displayQuery(diffVertical);
 		}
 	}
 	
 	public void clearDashboard() {
 		String clockID;
-		for (char i='A'; i <= 'E';i++) {
+		for (char i='E'; i <= 'H';i++) {
 			for (char j='1'; j <= '3';j++) {
 				clockID = new StringBuilder().append(i).append(j).toString();
 				removeClock(clockID);

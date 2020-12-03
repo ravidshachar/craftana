@@ -78,4 +78,20 @@ public class Methods {
     	for (int i = 0; i <= lines; i++)
     		drawLine(startpoint.add(0, i, 0), endpoint.sub(0, lines - i, 0), mat);
     }
+	
+	public static int arrayMax (int[] arr) {
+		int max = arr[0];
+		for (int val : arr) {
+			max = Math.max(val, max);
+		}
+		return max;
+	}
+	
+	public static int arraySum (int[] arr) {
+		int sum = 0;
+		for (int val : arr) {
+			sum += val;
+		}
+		return sum;
+	}
 }

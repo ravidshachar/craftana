@@ -16,20 +16,20 @@ public final class Clock extends Panel {
 	Vector leftCoords;
 	public Vector endpoint;
 	public Plugin plugin;
-	double threshold;
+	double maxValue;
 	Boolean isX; // if true, the clock is set horizontally to the X axis, if false it is set to the Z axis
-	Boolean autoThreshold;
+	Boolean autoMax;
 	
 	/**
 	 * constructor for a static threshold given by the player
 	 */
-	public Clock(Plugin plugin, Vector leftCoords, String socketPair, String query, double threshold, Boolean isX) {
+	public Clock(Plugin plugin, Vector leftCoords, String socketPair, String query, double maxValue, Boolean isX) {
 		super(socketPair, query);
 		this.plugin = plugin;
 		this.leftCoords = leftCoords;
-		this.threshold = threshold;
+		this.maxValue = maxValue;
 		this.isX = isX;
-		this.autoThreshold = false;
+		this.autoMax = false;
 	}
 	
 	/**
@@ -41,9 +41,9 @@ public final class Clock extends Panel {
 		super(socketPair, query);
 		this.plugin = plugin;
 		this.leftCoords = leftCoords;
-		this.threshold = -1;
+		this.maxValue = -1;
 		this.isX = isX;
-		this.autoThreshold = true;
+		this.autoMax = true;
 	}
 	
 	public void percent(int perc) {
@@ -70,11 +70,11 @@ public final class Clock extends Panel {
 		else
 			dist = new Vector(0, (int)Math.round(radius*Math.sin(radians)), -1 * (int)Math.round(radius*Math.cos(radians)));
 		endpoint = startpoint.add(dist);
-		drawLine(leftCoords, endpoint, Material.GLASS);
+		drawLine(leftCoords, endpoint, clockMat);
 		if (perc == 50)
-			drawLine(leftCoords.add(1, 0, 0), endpoint.add(1, 0, 0), Material.GLASS);
+			drawLine(leftCoords.add(1, 0, 0), endpoint.add(1, 0, 0), clockMat);
 		else
-			drawLine(leftCoords.add(1, 0, 0), endpoint, Material.GLASS);
+			drawLine(leftCoords.add(1, 0, 0), endpoint, clockMat);
 	}
 	
 	/**
@@ -114,11 +114,11 @@ public final class Clock extends Panel {
 	 */
 	public void displayQuery(int diffV) throws NumberFormatException, JSONException, IOException {
 		double query = Double.parseDouble(this.Query());
-		if (threshold == -1)
-			threshold = this.maxValue();
-		if (autoThreshold && query > threshold)
-			this.threshold = query;
-		percent((int) (100 * query / threshold));
+		if (maxValue == -1)
+			maxValue = this.getMaxValue();
+		if (autoMax && query > maxValue)
+			this.maxValue = query;
+		percent((int) (100 * query / maxValue));
 		BlockString bs = new BlockString(this.Query(), leftCoords, diffV, isX);
 		bs.clearString();
 		bs.drawString();

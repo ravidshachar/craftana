@@ -23,6 +23,7 @@ public class MCExporter extends HttpServlet {
 	static final Gauge playerAmount = Gauge.build().name("craftana_online_players").help("Current online craftana players").register();
 	static final Gauge clockAmount = Gauge.build().name("craftana_clocks").help("Amount of craftana clocks").register();
 	static final Gauge graphAmount = Gauge.build().name("craftana_graphs").help("Amount of craftana graphs").register();
+	static final Gauge histogramAmount = Gauge.build().name("craftana_histograms").help("Amount of craftana histograms").register();
 	
 	public MCExporter() {
 	    this(CollectorRegistry.defaultRegistry);
@@ -59,5 +60,6 @@ public class MCExporter extends HttpServlet {
 		playerAmount.set(0);
 		clockAmount.set(0);
 		graphAmount.set(0);
+		histogramAmount.set(0);
 	}
 }

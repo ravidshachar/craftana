@@ -15,8 +15,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import static io.github.ravidshachar.craftana.Constants.*;
-
 public class Panel {
 	private String socketPair; //the prometheus socket pair
 	private String query;
@@ -33,6 +31,18 @@ public class Panel {
 	
 	public String getRawQuery() {
 		return query;
+	}
+	
+	public String lastQueryTime() throws IOException, JSONException {
+		JSONObject json = readJsonFromUrl(formatURL());
+		if (!json.getString("status").equals("success")) {
+			return "status: " + json.getString("status") + "\n" + Boolean.toString(json.getString("status").equals("success"));
+		}
+		JSONArray result = json.getJSONObject("data").getJSONArray("result");
+		if (result == null || result.length() == 0) {
+			return "result: " + result.toString();
+		}
+		return result.getJSONObject(0).getJSONArray("value").getBigDecimal(0).toPlainString();
 	}
 	
 	/**
@@ -56,16 +66,16 @@ public class Panel {
 	 * This function receives step and returns
 	 * the query range from steps * step time ago until now
 	 */
-	public String[] RangeQuery(int step) throws IOException, JSONException {
-		return RangeQuery(Long.toString(System.currentTimeMillis() / 1000L - steps * step), Long.toString(System.currentTimeMillis() / 1000L), step + "s");
+	public String[] RangeQuery(int step, int numOfSteps) throws IOException, JSONException {
+		return RangeQuery(Long.toString(System.currentTimeMillis() / 1000L - numOfSteps * step), Long.toString(System.currentTimeMillis() / 1000L), step + "s");
 	}
 	
 	/**
 	 * This function receives step and end timestamp and returns
 	 * the query range from steps * step time ago until end timestamp
 	 */
-	public String[] RangeQuery(Long end, int step) throws IOException, JSONException {
-		return RangeQuery(Long.toString(end - (steps + 1) * step), Long.toString(end), step + "s");
+	public String[] RangeQuery(Long end, int step, int numOfSteps) throws IOException, JSONException {
+		return RangeQuery(Long.toString(end - (numOfSteps + 1) * step), Long.toString(end), step + "s");
 	}
 	
 	/**
@@ -92,11 +102,25 @@ public class Panel {
 	}
 	
 	/**
+	 * this method returns the minimum value over the last 10 minutes
+	 * @throws IOException 
+	 * @throws JSONException 
+	 */
+	public double getMinValue() throws JSONException, IOException {
+		String[] values = RangeQuery(Long.toString(System.currentTimeMillis() / 1000L - 600L), Long.toString(System.currentTimeMillis() / 1000L), "5s");
+		double min = Double.parseDouble(values[0]);
+		for (int i = 1; i < values.length; i++) {
+			min = Math.min(min, Double.parseDouble(values[i]));
+		}
+		return min;
+	}
+	
+	/**
 	 * this method returns the maximum value over the last 10 minutes
 	 * @throws IOException 
 	 * @throws JSONException 
 	 */
-	public double maxValue() throws JSONException, IOException {
+	public double getMaxValue() throws JSONException, IOException {
 		String[] values = RangeQuery(Long.toString(System.currentTimeMillis() / 1000L - 600L), Long.toString(System.currentTimeMillis() / 1000L), "5s");
 		double max = 0;
 		for (int i = 0; i < values.length; i++) {

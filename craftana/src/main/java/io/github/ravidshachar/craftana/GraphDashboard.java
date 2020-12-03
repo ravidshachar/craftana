@@ -26,19 +26,19 @@ public class GraphDashboard {
 	}
 	
 	/**
-	 * graph setter with static threshold
+	 * graph setter with static max value
 	 */
-	public void setGraph(String graphID, String socketPair, String query, int step, double threshold) {
+	public void setGraph(String graphID, String socketPair, String query, int step, double maxValue) {
 		if (graphs.get(graphID) == null) {
 			MCExporter.graphAmount.inc();
 		}
 		Vector leftCoords = firstCoords.add(getLeftCoords(graphID));
-		graphs.put(graphID, new Graph(plugin, leftCoords, socketPair, query, step, threshold, isX));
+		graphs.put(graphID, new Graph(plugin, leftCoords, socketPair, query, step, maxValue, isX));
 		graphs.get(graphID).clearGraph();
 	}
 	
 	/**
-	 * graph setter with auto threshold
+	 * graph setter with auto max value
 	 */
 	public void setGraph(String graphID, String socketPair, String query, int step) {
 		if (graphs.get(graphID) == null) {
@@ -59,7 +59,7 @@ public class GraphDashboard {
 	private Vector getLeftCoords(String graphID) {
 		char letter = graphID.charAt(0);
 		char number = graphID.charAt(1);
-		return new Vector(isX ? (letter - 'F') * diffHorizontal : 0, (number - '1') * diffVertical, isX ? 0 : (letter - 'F') * diffHorizontal);
+		return new Vector(isX ? (letter - 'I') * diffHorizontal : 0, (number - '1') * diffVertical, isX ? 0 : (letter - 'I') * diffHorizontal);
 	}
 	
 	public void updateDashboard() throws NumberFormatException, JSONException, IOException {
@@ -73,7 +73,7 @@ public class GraphDashboard {
 	 */
 	public void clearDashboard() {
 		String graphID;
-		for (char i='F'; i <= 'H';i++) {
+		for (char i='I'; i <= 'K';i++) {
 			for (char j='1'; j <= '2';j++) {
 				graphID = new StringBuilder().append(i).append(j).toString();
 				removeGraph(graphID);

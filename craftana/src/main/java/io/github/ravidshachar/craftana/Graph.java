@@ -21,22 +21,22 @@ public final class Graph extends Panel {
 	Plugin plugin;
 	Vector leftCoords;
 	int step;
-	double threshold;
+	double maxValue;
 	Boolean isX;
-	Boolean autoThreshold;
+	Boolean autoMax;
 	Long timestamp = -1L;
 	
 	/**
 	 * Constructor with static threshold
 	 */
-	public Graph(Plugin plugin, Vector leftCoords, String socketPair, String query, int step, double threshold, Boolean isX) {
+	public Graph(Plugin plugin, Vector leftCoords, String socketPair, String query, int step, double maxValue, Boolean isX) {
 		super(socketPair, query);
 		this.plugin = plugin;
 		this.leftCoords = leftCoords;
 		this.step = step;
-		this.threshold = threshold;
+		this.maxValue = maxValue;
 		this.isX = isX;
-		this.autoThreshold = false;
+		this.autoMax = false;
 	}
 	
 	/**
@@ -47,9 +47,9 @@ public final class Graph extends Panel {
 		this.plugin = plugin;
 		this.leftCoords = leftCoords;
 		this.step = step;
-		this.threshold = -1;
+		this.maxValue = -1;
 		this.isX = isX;
-		this.autoThreshold = true;
+		this.autoMax = true;
 	}
 	
 	/**
@@ -62,8 +62,8 @@ public final class Graph extends Panel {
 	/**
 	 * receive an int array with a length of <steps> and display it
 	 */
-	public void drawPillars(int[] heights) {
-		Vector currCoords = leftCoords;
+	public void drawGraph(int[] heights) {
+		Vector currCoords = leftCoords; // This Vector represents the bottom coords of the current value we're drawing
 		clearGraph();
 		for (int i = 0; i + 1 < steps; i++) {
 			new Location(
@@ -71,13 +71,11 @@ public final class Graph extends Panel {
 					currCoords.getX(), 
 					currCoords.getY() + heights[i], 
 					currCoords.getZ()
-					).getBlock().setType(graphMat);
-			/*new Location(
-					Bukkit.getServer().getWorld("world"), 
-					currCoords.getX() + (isX ? 2 : 0), 
-					currCoords.getY() + heights[i + 1], 
-					currCoords.getZ() + (isX ? 0 : 2)
-					).getBlock().setType(graphMat);*/
+					).getBlock().setType(graphMat); // draw current height (height[i])
+			
+			// We will now establish the current block and next block to see which is the bigger/smaller one
+			// and draw the block(s) in the column that is in-between the two values to make it look like a line graph
+			
 			int min = Math.min(heights[i], heights[i + 1]);
 			int max = Math.max(heights[i], heights[i+1]);
 			if (min == max) {
@@ -86,7 +84,7 @@ public final class Graph extends Panel {
 						currCoords.getX() + (isX ? 1 : 0), 
 						currCoords.getY() + min, 
 						currCoords.getZ() + (isX ? 0 : 1)
-				).getBlock().setType(graphMat);
+				).getBlock().setType(graphMat); // in case the two blocks are the same, draw the block in-between
 			}
 			else if (max - min == 1) {
 				new Location(
@@ -94,9 +92,11 @@ public final class Graph extends Panel {
 						currCoords.getX() + (isX ? 1 : 0), 
 						currCoords.getY() + heights[i], 
 						currCoords.getZ() + (isX ? 0 : 1)
-				).getBlock().setType(graphMat);
+				).getBlock().setType(graphMat); // in case the difference is just 1 block in either direction draw it in the height of the first block
 			}
 			else {
+				// if the difference between the two is greater than 2, draw all blocks in-between the two heights
+				// in the column that is between them (non-inclusive)
 				for (int j = min + 1; j < max; j++) {
 					new Location(
 							Bukkit.getServer().getWorld("world"), 
@@ -106,8 +106,10 @@ public final class Graph extends Panel {
 					).getBlock().setType(graphMat);
 				}
 			}
-			currCoords = currCoords.add(isX ? 2 : 0, 0, isX ? 0 : 2);
+			currCoords = currCoords.add(isX ? 2 : 0, 0, isX ? 0 : 2); // adjust the currCoords for the next column (value)
 		}
+		
+		// The loop runs short by one block so we fill it in here
 		new Location(
 				Bukkit.getServer().getWorld("world"), 
 				currCoords.getX(), 
@@ -133,20 +135,20 @@ public final class Graph extends Panel {
 		while (System.currentTimeMillis() / 1000L - timestamp >= step) {
 			timestamp += step;
 		}
-		String[] values = this.RangeQuery(timestamp, step);
+		String[] values = this.RangeQuery(timestamp, step, steps);
 		int[] heights = new int[steps];
-		if (threshold == -1)
-			this.threshold = this.maxValue();
-		if (autoThreshold && Double.parseDouble(values[values.length - 1]) > threshold)
-			this.threshold = Double.parseDouble(values[values.length - 1]);
+		if (maxValue == -1)
+			this.maxValue = this.getMaxValue();
+		if (autoMax && Double.parseDouble(values[values.length - 1]) > maxValue)
+			this.maxValue = Double.parseDouble(values[values.length - 1]);
 		for (int i = 1; i <= steps; i++) {
 			// Going from the end to the beginning, if values has a value, divide it by the threshold and multiply by graphHeight
 			// to get proportional pillar height
 			if (values.length - i >= 0)
-				heights[steps - i] = Math.max((int) (graphHeight * Double.parseDouble(values[values.length - i]) / threshold), graphHeight);
+				heights[steps - i] = Math.min((int) (graphHeight * Double.parseDouble(values[values.length - i]) / maxValue), graphHeight);
 			else
 				heights[steps - i] = 0;
 		}
-		drawPillars(heights);
+		drawGraph(heights);
 	}
 }

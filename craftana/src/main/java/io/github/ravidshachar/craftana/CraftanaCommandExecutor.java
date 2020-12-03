@@ -27,11 +27,13 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 	public Vector endpoint;
 	ClockDashboard clockDashboard;
 	GraphDashboard graphDashboard;
+	HistogramDashboard histogramDashboard;
 	
 	public CraftanaCommandExecutor(craftana plugin) {
 		this.plugin = plugin; // Store the plugin
 		clockDashboard = new ClockDashboard(plugin, firstArrowCoords, diffX, diffY, true);
 		graphDashboard = new GraphDashboard(plugin, firstGraphCoords, false);
+		histogramDashboard = new HistogramDashboard(plugin, firstHistogramCoords, false);
 	}
 	
 	@Override
@@ -42,6 +44,40 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 		plugin.getLogger().info("Got to onCommand!");
 		switch (cmd.getName().toLowerCase()) {
 		
+			case "sethistogram":
+				if (args.length < 5) {
+					sender.sendMessage("Must have 5 arguments");
+					return false;
+				}
+			
+				if (args[0].length() != 2 || 
+						args[0].charAt(0) < 'A' || 
+						args[0].charAt(0) > 'D' ||
+						args[0].charAt(1) < '1' ||
+						args[0].charAt(1) > '2') 
+				{
+						sender.sendMessage("histogramID must be a letter (A-D) and a number(1-2) in that order");
+						return false;
+				}
+			
+				try {
+					//if (!args[3].equalsIgnoreCase("auto"))
+					Double.parseDouble(args[2]);
+					Double.parseDouble(args[3]);
+				}
+				catch(Exception e) {
+					sender.sendMessage("min and max values must be auto or numbers!");
+					return false;
+				}
+			
+				StringBuilder histogram_query = new StringBuilder(args[4]);
+				for (int arg = 5; arg < args.length; arg++)
+					histogram_query.append(" ").append(args[arg]);
+				//if (args[3].equalsIgnoreCase("auto"))
+				//	return setGraph(args[0], args[1], step, histogram_query.toString(), sender);
+				return setHistogram(args[0], args[1], Double.parseDouble(args[2]), Double.parseDouble(args[3]), histogram_query.toString(), sender);
+		
+		
 			case "setclock":
 				if (args.length < 4) {
 					sender.sendMessage("Must have 4 arguments");
@@ -49,11 +85,11 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 				}
 				
 				if (args[0].length() != 2 || 
-					args[0].charAt(0) < 'A' || 
-					args[0].charAt(0) > 'E' ||
+					args[0].charAt(0) < 'E' || 
+					args[0].charAt(0) > 'H' ||
 					args[0].charAt(1) < '1' ||
 					args[0].charAt(1) > '3') {
-						sender.sendMessage("clockID must be a letter (A-E) and a number(1-3) in that order");
+						sender.sendMessage("clockID must be a letter (E-H) and a number(1-3) in that order");
 						return false;
 				}
 				
@@ -62,7 +98,7 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 						Double.parseDouble(args[2]);
 				}
 				catch(Exception e) {
-					sender.sendMessage("threshold must be auto or a number!");
+					sender.sendMessage("max value must be auto or a number!");
 					return false;
 				}
 				
@@ -80,12 +116,12 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 				}
 				
 				if (args[0].length() != 2 || 
-					args[0].charAt(0) < 'F' || 
-					args[0].charAt(0) > 'H' ||
+					args[0].charAt(0) < 'I' || 
+					args[0].charAt(0) > 'K' ||
 					args[0].charAt(1) < '1' ||
 					args[0].charAt(1) > '2') 
 				{
-						sender.sendMessage("graphID must be a letter (F-H) and a number(1-2) in that order");
+						sender.sendMessage("graphID must be a letter (I-K) and a number(1-2) in that order");
 						return false;
 				}
 				
@@ -102,7 +138,7 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 						Double.parseDouble(args[3]);
 				}
 				catch(Exception e) {
-					sender.sendMessage("threshold must be auto or a number!");
+					sender.sendMessage("max value must be auto or a number!");
 					return false;
 				}
 				
@@ -114,9 +150,11 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 					return setGraph(args[0], args[1], step, graph_query.toString(), sender);
 				return setGraph(args[0], args[1], step, Double.parseDouble(args[3]), graph_query.toString(), sender);
 				
+				
 			case "cleardashboard":
 				clockDashboard.clearDashboard();
 				graphDashboard.clearDashboard();
+				histogramDashboard.clearDashboard();
 				return true;
 				
 			case "import":
@@ -139,16 +177,6 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 				sender.sendMessage("Changes made!");
 				return true;
 				
-			case "drawrect":
-				if (args.length != 6) {
-					sender.sendMessage("must have 6 args");
-					return false;
-				}
-				drawRect(new Vector(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2])), 
-						 new Vector(Integer.parseInt(args[3]), Integer.parseInt(args[4]), Integer.parseInt(args[5])), 
-						 Material.BLACK_CONCRETE);
-				return true;
-				
 			case "export":
 				if (args.length != 1) {
 					sender.sendMessage("Must have 1 path argument");
@@ -164,6 +192,16 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 					plugin.getLogger().info(stackTraceToString(e));
 					return false;
 				}
+				
+			case "drawrect":
+				if (args.length != 6) {
+					sender.sendMessage("must have 6 args");
+					return false;
+				}
+				drawRect(new Vector(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2])), 
+						 new Vector(Integer.parseInt(args[3]), Integer.parseInt(args[4]), Integer.parseInt(args[5])), 
+						 Material.BLACK_CONCRETE);
+				return true;
 		}
 		return false;
 	}
@@ -171,8 +209,8 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 	/**
 	 * This method gets a query, socket pair and a threshold, as well as row and column and creates a new panel in game
 	 */
-	public boolean setClock(String clockID,String socketPair, double threshold, String query, CommandSender sender) {
-		clockDashboard.setClock(clockID, socketPair, query, threshold);
+	public boolean setClock(String clockID,String socketPair, double maxValue, String query, CommandSender sender) {
+		clockDashboard.setClock(clockID, socketPair, query, maxValue);
 		try {
 			plugin.updateAll(this);
 		}
@@ -216,10 +254,10 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 	}
 	
 	/**
-	 * graph setter with static threshold
+	 * graph setter with static max value
 	 */
-	public boolean setGraph(String graphID, String socketPair, int step, double threshold, String query, CommandSender sender) {
-		graphDashboard.setGraph(graphID, socketPair, query, step, threshold);
+	public boolean setGraph(String graphID, String socketPair, int step, double maxValue, String query, CommandSender sender) {
+		graphDashboard.setGraph(graphID, socketPair, query, step, maxValue);
 		
 		try {
 			plugin.updateAll(this);
@@ -240,7 +278,7 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 	}
 	
 	/**
-	 * graph setter with auto threshold
+	 * graph setter with auto max value
 	 */
 	public boolean setGraph(String graphID, String socketPair, int step, String query, CommandSender sender) {
 		graphDashboard.setGraph(graphID, socketPair, query, step);
@@ -263,6 +301,26 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 		return true;
 	}
 	
+	public boolean setHistogram(String histogramID, String socketPair, double minValue, double maxValue, String query, CommandSender sender) {
+		histogramDashboard.setHistogram(histogramID, socketPair, query, minValue, maxValue);
+		
+		try {
+			plugin.updateAll(this);
+		}
+		catch (IOException e) {
+			plugin.getLogger().info(stackTraceToString(e));
+			plugin.getLogger().info("***HANDLED***");
+			sender.sendMessage("Unknown Host " + socketPair);
+			histogramDashboard.removeHistogram(histogramID);
+			return false;
+		}
+		catch (Exception e) {
+			plugin.getLogger().info(stackTraceToString(e));
+			return false;
+		}
+		return true;
+	}
+	
 	/**
 	 * import JSON config file, if at least 1 change was made return true
 	 */
@@ -282,29 +340,41 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 			return false;
 		}
 		
-		JSONArray clocks = obj.getJSONObject("dashboards").getJSONArray("clocks");
 		JSONObject temp;
+		JSONArray clocks = obj.getJSONObject("dashboards").getJSONArray("clocks");
 		JSONArray graphs = obj.getJSONObject("dashboards").getJSONArray("graphs");
+		JSONArray histograms = obj.getJSONObject("dashboards").getJSONArray("histograms");
 		
 		for (int i = 0; i < clocks.length(); i++) {
 			temp = clocks.getJSONObject(i);
-			if (temp.get("threshold").equals("auto"))
+			if (temp.get("maxValue").equals("auto"))
 				success = setClock(temp.getString("clockID"), temp.getString("socketPair"), temp.getString("query"), sender);
 			else
-				success = setClock(temp.getString("clockID"), temp.getString("socketPair"), temp.getDouble("threshold"), temp.getString("query"), sender);
+				success = setClock(temp.getString("clockID"), temp.getString("socketPair"), temp.getDouble("maxValue"), temp.getString("query"), sender);
 			plugin.getLogger().info(temp.getString("clockID") + " " + String.valueOf(success));
 			partialSuccess = partialSuccess || success;
 		}
 		
 		for (int i = 0; i < graphs.length(); i++) {
 			temp = graphs.getJSONObject(i);
-			if (temp.get("threshold").equals("auto"))
+			if (temp.get("maxValue").equals("auto"))
 				success = setGraph(temp.getString("graphID"), temp.getString("socketPair"), temp.getInt("step"), temp.getString("query"), sender);
 			else
-				success = setGraph(temp.getString("graphID"), temp.getString("socketPair"), temp.getInt("step"), temp.getDouble("threshold"), temp.getString("query"), sender);
+				success = setGraph(temp.getString("graphID"), temp.getString("socketPair"), temp.getInt("step"), temp.getDouble("maxValue"), temp.getString("query"), sender);
 			plugin.getLogger().info(temp.getString("graphID") + " " + String.valueOf(success));
 			partialSuccess = partialSuccess || success;
 		}
+		
+		for (int i = 0; i < histograms.length(); i++) {
+			temp = histograms.getJSONObject(i);
+			//if (temp.get("maxValue").equals("auto"))
+				//success = setHistogram(temp.getString("histogramID"), temp.getString("socketPair"), temp.getString("query"), sender);
+			//else
+			success = setHistogram(temp.getString("histogramID"), temp.getString("socketPair"), temp.getDouble("minValue"), temp.getDouble("maxValue"), temp.getString("query"), sender);
+			plugin.getLogger().info(temp.getString("histogramID") + " " + String.valueOf(success));
+			partialSuccess = partialSuccess || success;
+		}
+		
 		return partialSuccess;
 	}
 	
@@ -319,7 +389,7 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 	 * 				{
 	 * 				"clockID": "XY",
 	 * 				"socketPair": "ipOrAddress:port",
-	 * 				"threshold": [double] x,
+	 * 				"maxValue": [double] x,
 	 * 				"query": "promQLQuery{}"
 	 * 				},
 	 * 				...
@@ -330,7 +400,7 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 	 * 				"graphID": "XY",
 	 * 				"socketPair": "ipOrAddress:port",
 	 * 				"step": [int] timeInSeconds,
-	 * 				"threshold": [double] x,
+	 * 				"maxValue": [double] x,
 	 * 				"query": "promQLQuery{}"
 	 * 				},
 	 * 				...
@@ -343,12 +413,13 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 		Map<String, Object> temp;
 		ArrayList<Object> clocks = new ArrayList<Object>();
 		ArrayList<Object> graphs = new ArrayList<Object>();
+		ArrayList<Object> histograms = new ArrayList<Object>();
 		
 		for (String clockID : clockDashboard.clocks.keySet()) {
 			temp = new HashMap<String, Object>();
 			temp.put("clockID", clockID);
 			temp.put("socketPair", clockDashboard.clocks.get(clockID).getSocketPair());
-			temp.put("threshold", clockDashboard.clocks.get(clockID).threshold);
+			temp.put("maxValue", clockDashboard.clocks.get(clockID).maxValue);
 			temp.put("query", clockDashboard.clocks.get(clockID).getRawQuery());
 			clocks.add(temp);
 		}
@@ -358,14 +429,25 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 			temp.put("graphID", graphID);
 			temp.put("socketPair", graphDashboard.graphs.get(graphID).getSocketPair());
 			temp.put("step", graphDashboard.graphs.get(graphID).step);
-			temp.put("threshold", graphDashboard.graphs.get(graphID).threshold);
+			temp.put("maxValue", graphDashboard.graphs.get(graphID).maxValue);
 			temp.put("query", graphDashboard.graphs.get(graphID).getRawQuery());
 			graphs.add(temp);
+		}
+		
+		for (String histogramID : histogramDashboard.histograms.keySet()) {
+			temp = new HashMap<String, Object>();
+			temp.put("histogramID", histogramID);
+			temp.put("socketPair", histogramDashboard.histograms.get(histogramID).getSocketPair());
+			temp.put("minValue", histogramDashboard.histograms.get(histogramID).minValue);
+			temp.put("maxValue", histogramDashboard.histograms.get(histogramID).maxValue);
+			temp.put("query", histogramDashboard.histograms.get(histogramID).getRawQuery());
+			histograms.add(temp);
 		}
 		
 		temp = new HashMap<String, Object>();
 		temp.put("clocks", clocks);
 		temp.put("graphs", graphs);
+		temp.put("histograms", histograms);
 		map.put("dashboards", temp);
 		String json = (new JSONObject(map)).toString();
 		FileWriter myWriter = new FileWriter(path);

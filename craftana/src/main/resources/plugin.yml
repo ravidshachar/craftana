@@ -4,10 +4,13 @@ version: 1.0
 commands:
     setclock:
         description: This command creates sets a clock
-        usage: /setclock [ColRow] [prom socketPair] [threshold] [query]
+        usage: /setclock [ColRow] [prom socketPair] [maxValue] [query]
     setgraph:
         description: This command sets a graph
-        usage: /setgraph [ColRow] [prom socketPair] [step (seconds)] [threshold] [query]
+        usage: /setgraph [ColRow] [prom socketPair] [step (seconds)] [maxValue] [query]
+    sethistogram:
+        description: This command sets a histogram
+        usage: //sethistogram [ColRow] [prom socketPair] [minValue)] [maxValue] [query]
     cleardashboard:
         description: This command clears the clock dashboard
         usage: /cleardashboard

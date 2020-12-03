@@ -23,6 +23,7 @@ public final class craftana extends JavaPlugin {
     	// Register all commands
     	this.getCommand("setclock").setExecutor(commandExecutor);
     	this.getCommand("setgraph").setExecutor(commandExecutor);
+    	this.getCommand("sethistogram").setExecutor(commandExecutor);
     	this.getCommand("cleardashboard").setExecutor(commandExecutor);
     	this.getCommand("import").setExecutor(commandExecutor);
     	this.getCommand("export").setExecutor(commandExecutor);
@@ -80,11 +81,13 @@ public final class craftana extends JavaPlugin {
     public void updateAll(CraftanaCommandExecutor commandExecutor) throws NumberFormatException, JSONException, IOException {
     	commandExecutor.clockDashboard.updateDashboard();
     	commandExecutor.graphDashboard.updateDashboard();
+    	commandExecutor.histogramDashboard.updateDashboard();
     }
     
     public void clearAll(CraftanaCommandExecutor commandExecutor) {
     	commandExecutor.clockDashboard.clearDashboard();
     	commandExecutor.graphDashboard.clearDashboard();
+    	commandExecutor.histogramDashboard.clearDashboard();
     	getLogger().info("All clear!");
     }
 }
