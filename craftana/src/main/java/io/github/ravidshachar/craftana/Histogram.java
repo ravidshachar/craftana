@@ -11,47 +11,34 @@ import org.bukkit.plugin.Plugin;
 import org.json.JSONException;
 
 public class Histogram extends Panel {
-	Plugin plugin;
-	Vector leftCoords;
 	int bucketAmounts[];
 	double minValue;
-	double maxValue;
-	Boolean isX;
-	Boolean autoMinMax;
 	Long timestamp = -1L;
 	
 	/**
 	 * Constructor with static max
 	 */
 	public Histogram(Plugin plugin, Vector leftCoords, String socketPair, String query, double minValue, double maxValue, Boolean isX) {
-		super(socketPair, query);
-		this.plugin = plugin;
-		this.leftCoords = leftCoords;
+		super(plugin, leftCoords, socketPair, query, maxValue, isX);
 		this.bucketAmounts = new int[buckets];
 		Arrays.fill(bucketAmounts, 0);
 		this.minValue = minValue;
-		this.maxValue = maxValue;
-		this.isX = isX;
-		this.autoMinMax = false;
 	}
 	
 	/**
 	 * Constructor with auto max
 	 */
 	public Histogram(Plugin plugin, Vector leftCoords, String socketPair, String query, Boolean isX) {
-		super(socketPair, query);
-		this.plugin = plugin;
-		this.leftCoords = leftCoords;
+		super(plugin, leftCoords, socketPair, query, isX);
+		this.bucketAmounts = new int[buckets];
+		Arrays.fill(bucketAmounts, 0);
 		this.minValue = -1;
-		this.maxValue = -1;
-		this.isX = isX;
-		this.autoMinMax = true;
 	}
 	
 	/**
 	 * clears histogram
 	 */
-	public void clearHistogram() {
+	public void clearPanel() {
 		drawRect(leftCoords, leftCoords.add(isX ? histogramDir * histogramWidth : 0, histogramHeight, isX ? 0 : histogramDir * histogramWidth), Material.AIR);
 	}
 	
@@ -63,7 +50,7 @@ public class Histogram extends Panel {
 		int height; // temp var for the visualised height
 		int maxBucket = arrayMax(bucketAmounts);
 		int sumOfBuckets = arraySum(bucketAmounts);
-		clearHistogram();
+		clearPanel();
 		for (int i = 0; i < buckets; i++) {
 			// After many formulation attempts, I found this formula to work quite nicely
 			height = (int) (histogramHeight * (bucketAmounts[i] * maxBucket) / (Math.pow(maxBucket, 2) + sumOfBuckets));
@@ -86,7 +73,7 @@ public class Histogram extends Panel {
 		// maxValue as well as redo bucket amounts
 		if (lastQueryVal >= maxValue) {
 			bucketAmounts[buckets - 1]++;
-			if (autoMinMax) {
+			if (autoBoundaries) {
 				maxValue = lastQueryVal;
 				// ***RedoBucketAmounts()***
 			}

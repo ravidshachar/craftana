@@ -13,23 +13,13 @@ import org.json.JSONException;
  * Physical representaion of a Clock type panel in Minecraft
  */
 public final class Clock extends Panel {
-	Vector leftCoords;
 	public Vector endpoint;
-	public Plugin plugin;
-	double maxValue;
-	Boolean isX; // if true, the clock is set horizontally to the X axis, if false it is set to the Z axis
-	Boolean autoMax;
 	
 	/**
 	 * constructor for a static threshold given by the player
 	 */
 	public Clock(Plugin plugin, Vector leftCoords, String socketPair, String query, double maxValue, Boolean isX) {
-		super(socketPair, query);
-		this.plugin = plugin;
-		this.leftCoords = leftCoords;
-		this.maxValue = maxValue;
-		this.isX = isX;
-		this.autoMax = false;
+		super(plugin, leftCoords, socketPair, query, maxValue, isX);
 	}
 	
 	/**
@@ -38,12 +28,8 @@ public final class Clock extends Panel {
 	 * @throws JSONException 
 	 */
 	public Clock(Plugin plugin, Vector leftCoords, String socketPair, String query, Boolean isX) {
-		super(socketPair, query);
-		this.plugin = plugin;
-		this.leftCoords = leftCoords;
-		this.maxValue = -1;
-		this.isX = isX;
-		this.autoMax = true;
+		super(plugin, leftCoords, socketPair, query, isX);
+
 	}
 	
 	public void percent(int perc) {
@@ -89,7 +75,7 @@ public final class Clock extends Panel {
 	/**
 	 * This method clears the entire clock type panel
 	 */
-	public void clearClock() {
+	public void clearPanel() {
 		Vector startpoint, dist, endpoint = new Vector();
 		double radians;
 		for (int i = 0; i <= 100; i++) {
@@ -112,14 +98,14 @@ public final class Clock extends Panel {
 	 * @throws JSONException 
 	 * @throws NumberFormatException 
 	 */
-	public void displayQuery(int diffV) throws NumberFormatException, JSONException, IOException {
+	public void displayQuery() throws NumberFormatException, JSONException, IOException {
 		double query = Double.parseDouble(this.Query());
 		if (maxValue == -1)
 			maxValue = this.getMaxValue();
-		if (autoMax && query > maxValue)
+		if (autoBoundaries && query > maxValue)
 			this.maxValue = query;
 		percent((int) (100 * query / maxValue));
-		BlockString bs = new BlockString(this.Query(), leftCoords, diffV, isX);
+		BlockString bs = new BlockString(this.Query(), leftCoords, diffY, isX);
 		bs.clearString();
 		bs.drawString();
 	}

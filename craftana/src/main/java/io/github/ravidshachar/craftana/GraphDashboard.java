@@ -1,72 +1,59 @@
 package io.github.ravidshachar.craftana;
 
-import java.io.IOException;
-import java.util.HashMap;
-
 import org.bukkit.plugin.Plugin;
-import org.json.JSONException;
 
 import static io.github.ravidshachar.craftana.Constants.*;
 
-public class GraphDashboard {
-	Plugin plugin;
-	HashMap<String, Graph> graphs; // String graphID : Graph graphObject
-	int diffHorizontal;
-	int diffVertical;
-	Boolean isX;
-	Vector firstCoords;
+public class GraphDashboard extends Dashboard<Graph> {
+	static int diffHorizontal = graphWidth + 2;
+	static int diffVertical = -1 * (graphHeight + 1);
 	
 	public GraphDashboard(Plugin plugin, Vector firstCoords, Boolean isX) {
-		this.plugin = plugin;
-		graphs = new HashMap<String, Graph>();
-		this.diffHorizontal = graphWidth + 2;
-		this.diffVertical = -1 * (graphHeight + 1);
-		this.firstCoords = firstCoords;
-		this.isX = isX;
+		super(plugin, diffHorizontal, diffVertical, isX, firstCoords);
 	}
 	
 	/**
 	 * graph setter with static max value
 	 */
 	public void setGraph(String graphID, String socketPair, String query, int step, double maxValue) {
-		if (graphs.get(graphID) == null) {
+		if (panels.get(graphID) == null) {
 			MCExporter.graphAmount.inc();
 		}
 		Vector leftCoords = firstCoords.add(getLeftCoords(graphID));
-		graphs.put(graphID, new Graph(plugin, leftCoords, socketPair, query, step, maxValue, isX));
-		graphs.get(graphID).clearGraph();
+		panels.put(graphID, new Graph(plugin, leftCoords, socketPair, query, step, maxValue, isX));
+		panels.get(graphID).clearPanel();
 	}
 	
 	/**
 	 * graph setter with auto max value
 	 */
 	public void setGraph(String graphID, String socketPair, String query, int step) {
-		if (graphs.get(graphID) == null) {
+		if (panels.get(graphID) == null) {
 			MCExporter.graphAmount.inc();
 		}
 		Vector leftCoords = firstCoords.add(getLeftCoords(graphID));
-		graphs.put(graphID, new Graph(plugin, leftCoords, socketPair, query, step, isX));
-		graphs.get(graphID).clearGraph();
+		panels.put(graphID, new Graph(plugin, leftCoords, socketPair, query, step, isX));
+		panels.get(graphID).clearPanel();
 	}
 	
-	public void removeGraph(String graphID) {
+	/*public void removePanel(String graphID) {
 		if (graphs.get(graphID) == null)
 			return;
 		Graph tempGraph = graphs.remove(graphID);
-		tempGraph.clearGraph();
-	}
+		tempGraph.clearPanel();
+	}*/
 	
-	private Vector getLeftCoords(String graphID) {
+	protected Vector getLeftCoords(String graphID) {
 		char letter = graphID.charAt(0);
 		char number = graphID.charAt(1);
 		return new Vector(isX ? (letter - 'I') * diffHorizontal : 0, (number - '1') * diffVertical, isX ? 0 : (letter - 'I') * diffHorizontal);
 	}
 	
-	public void updateDashboard() throws NumberFormatException, JSONException, IOException {
+	/*public void updateDashboard() throws NumberFormatException, JSONException, IOException {
 		for (Graph graph : graphs.values()) {
 			graph.displayQuery();
 		}
-	}
+	}*/
 	
 	/**
 	 * This function clears current graphs as long as they're registered
@@ -76,7 +63,7 @@ public class GraphDashboard {
 		for (char i='I'; i <= 'K';i++) {
 			for (char j='1'; j <= '2';j++) {
 				graphID = new StringBuilder().append(i).append(j).toString();
-				removeGraph(graphID);
+				removePanel(graphID);
 			}
 		}
 		MCExporter.graphAmount.set(0);

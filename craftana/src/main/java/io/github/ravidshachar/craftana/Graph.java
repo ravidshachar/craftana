@@ -17,45 +17,29 @@ import java.io.IOException;
  * Physical representaion of a query range with a graph
  */
 public final class Graph extends Panel {
-
-	Plugin plugin;
-	Vector leftCoords;
 	int step;
-	double maxValue;
-	Boolean isX;
-	Boolean autoMax;
 	Long timestamp = -1L;
 	
 	/**
 	 * Constructor with static threshold
 	 */
 	public Graph(Plugin plugin, Vector leftCoords, String socketPair, String query, int step, double maxValue, Boolean isX) {
-		super(socketPair, query);
-		this.plugin = plugin;
-		this.leftCoords = leftCoords;
+		super(plugin, leftCoords, socketPair, query, maxValue, isX);
 		this.step = step;
-		this.maxValue = maxValue;
-		this.isX = isX;
-		this.autoMax = false;
 	}
 	
 	/**
 	 * Constructor with auto threshold
 	 */
 	public Graph(Plugin plugin, Vector leftCoords, String socketPair, String query, int step, Boolean isX) {
-		super(socketPair, query);
-		this.plugin = plugin;
-		this.leftCoords = leftCoords;
+		super(plugin, leftCoords, socketPair, query, isX);
 		this.step = step;
-		this.maxValue = -1;
-		this.isX = isX;
-		this.autoMax = true;
 	}
 	
 	/**
 	 * clears graph
 	 */
-	public void clearGraph() {
+	public void clearPanel() {
 		drawRect(leftCoords, leftCoords.add(isX ? graphWidth : 0, graphHeight, isX ? 0 : graphWidth), Material.AIR);
 	}
 	
@@ -64,7 +48,7 @@ public final class Graph extends Panel {
 	 */
 	public void drawGraph(int[] heights) {
 		Vector currCoords = leftCoords; // This Vector represents the bottom coords of the current value we're drawing
-		clearGraph();
+		clearPanel();
 		for (int i = 0; i + 1 < steps; i++) {
 			new Location(
 					Bukkit.getServer().getWorld("world"), 
@@ -139,7 +123,7 @@ public final class Graph extends Panel {
 		int[] heights = new int[steps];
 		if (maxValue == -1)
 			this.maxValue = this.getMaxValue();
-		if (autoMax && Double.parseDouble(values[values.length - 1]) > maxValue)
+		if (autoBoundaries && Double.parseDouble(values[values.length - 1]) > maxValue)
 			this.maxValue = Double.parseDouble(values[values.length - 1]);
 		for (int i = 1; i <= steps; i++) {
 			// Going from the end to the beginning, if values has a value, divide it by the threshold and multiply by graphHeight

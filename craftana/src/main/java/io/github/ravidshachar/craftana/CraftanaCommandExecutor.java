@@ -31,7 +31,7 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 	
 	public CraftanaCommandExecutor(craftana plugin) {
 		this.plugin = plugin; // Store the plugin
-		clockDashboard = new ClockDashboard(plugin, firstArrowCoords, diffX, diffY, true);
+		clockDashboard = new ClockDashboard(plugin, firstArrowCoords, true);
 		graphDashboard = new GraphDashboard(plugin, firstGraphCoords, false);
 		histogramDashboard = new HistogramDashboard(plugin, firstHistogramCoords, false);
 	}
@@ -218,7 +218,7 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 			plugin.getLogger().info(stackTraceToString(e));
 			plugin.getLogger().info("***HANDLED!***");
 			sender.sendMessage("Bad query or Unknown Host " + socketPair);
-			clockDashboard.removeClock(clockID);
+			clockDashboard.removePanel(clockID);
 			return false;
 		}
 		catch (Exception e) {
@@ -242,7 +242,7 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 			plugin.getLogger().info(stackTraceToString(e));
 			plugin.getLogger().info("***HANDLED!***");
 			sender.sendMessage("Bad query or Unknown Host " + socketPair);
-			clockDashboard.removeClock(clockID);
+			clockDashboard.removePanel(clockID);
 			return false;
 		}
 		catch (Exception e) {
@@ -266,7 +266,7 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 			plugin.getLogger().info(stackTraceToString(e));
 			plugin.getLogger().info("***HANDLED***");
 			sender.sendMessage("Unknown Host " + socketPair);
-			graphDashboard.removeGraph(graphID);
+			graphDashboard.removePanel(graphID);
 			return false;
 		}
 		catch (Exception e) {
@@ -290,7 +290,7 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 			plugin.getLogger().info(stackTraceToString(e));
 			plugin.getLogger().info("***HANDLED***");
 			sender.sendMessage("Unknown Host " + socketPair);
-			graphDashboard.removeGraph(graphID);
+			graphDashboard.removePanel(graphID);
 			return false;
 		}
 		catch (Exception e) {
@@ -311,7 +311,7 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 			plugin.getLogger().info(stackTraceToString(e));
 			plugin.getLogger().info("***HANDLED***");
 			sender.sendMessage("Unknown Host " + socketPair);
-			histogramDashboard.removeHistogram(histogramID);
+			histogramDashboard.removePanel(histogramID);
 			return false;
 		}
 		catch (Exception e) {
@@ -415,32 +415,32 @@ public class CraftanaCommandExecutor implements CommandExecutor, Listener {
 		ArrayList<Object> graphs = new ArrayList<Object>();
 		ArrayList<Object> histograms = new ArrayList<Object>();
 		
-		for (String clockID : clockDashboard.clocks.keySet()) {
+		for (String clockID : clockDashboard.panels.keySet()) {
 			temp = new HashMap<String, Object>();
 			temp.put("clockID", clockID);
-			temp.put("socketPair", clockDashboard.clocks.get(clockID).getSocketPair());
-			temp.put("maxValue", clockDashboard.clocks.get(clockID).maxValue);
-			temp.put("query", clockDashboard.clocks.get(clockID).getRawQuery());
+			temp.put("socketPair", clockDashboard.panels.get(clockID).getSocketPair());
+			temp.put("maxValue", clockDashboard.panels.get(clockID).maxValue);
+			temp.put("query", clockDashboard.panels.get(clockID).getRawQuery());
 			clocks.add(temp);
 		}
 		
-		for (String graphID : graphDashboard.graphs.keySet()) {
+		for (String graphID : graphDashboard.panels.keySet()) {
 			temp = new HashMap<String, Object>();
 			temp.put("graphID", graphID);
-			temp.put("socketPair", graphDashboard.graphs.get(graphID).getSocketPair());
-			temp.put("step", graphDashboard.graphs.get(graphID).step);
-			temp.put("maxValue", graphDashboard.graphs.get(graphID).maxValue);
-			temp.put("query", graphDashboard.graphs.get(graphID).getRawQuery());
+			temp.put("socketPair", graphDashboard.panels.get(graphID).getSocketPair());
+			temp.put("step", graphDashboard.panels.get(graphID).step);
+			temp.put("maxValue", graphDashboard.panels.get(graphID).maxValue);
+			temp.put("query", graphDashboard.panels.get(graphID).getRawQuery());
 			graphs.add(temp);
 		}
 		
-		for (String histogramID : histogramDashboard.histograms.keySet()) {
+		for (String histogramID : histogramDashboard.panels.keySet()) {
 			temp = new HashMap<String, Object>();
 			temp.put("histogramID", histogramID);
-			temp.put("socketPair", histogramDashboard.histograms.get(histogramID).getSocketPair());
-			temp.put("minValue", histogramDashboard.histograms.get(histogramID).minValue);
-			temp.put("maxValue", histogramDashboard.histograms.get(histogramID).maxValue);
-			temp.put("query", histogramDashboard.histograms.get(histogramID).getRawQuery());
+			temp.put("socketPair", histogramDashboard.panels.get(histogramID).getSocketPair());
+			temp.put("minValue", histogramDashboard.panels.get(histogramID).minValue);
+			temp.put("maxValue", histogramDashboard.panels.get(histogramID).maxValue);
+			temp.put("query", histogramDashboard.panels.get(histogramID).getRawQuery());
 			histograms.add(temp);
 		}
 		

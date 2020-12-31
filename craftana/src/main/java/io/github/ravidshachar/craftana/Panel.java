@@ -11,18 +11,40 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Panel {
-	private String socketPair; //the prometheus socket pair
-	private String query;
+public abstract class Panel {
+	protected String socketPair; //the prometheus socket pair
+	protected String query;
+	Plugin plugin;
+	Vector leftCoords;
+	double maxValue;
+	Boolean isX;
+	Boolean autoBoundaries;
 	
-	public Panel(String socketPair, String query) {
+	public Panel(Plugin plugin, Vector leftCoords, String socketPair, String query, double maxValue, Boolean isX) {
 		//this.socketPair = String.format("http://%s/api/v1", socketPair);
+		this.plugin = plugin;
+		this.leftCoords = leftCoords;
 		this.socketPair = socketPair;
 		this.query = query;
+		this.maxValue = maxValue;
+		this.isX = isX;
+		this.autoBoundaries = false;
+	}
+	
+	public Panel(Plugin plugin, Vector leftCoords, String socketPair, String query, Boolean isX) {
+		//this.socketPair = String.format("http://%s/api/v1", socketPair);
+		this.plugin = plugin;
+		this.leftCoords = leftCoords;
+		this.socketPair = socketPair;
+		this.query = query;
+		this.maxValue = -1;
+		this.isX = isX;
+		this.autoBoundaries = false;
 	}
 	
 	public String getSocketPair() {
@@ -100,6 +122,10 @@ public class Panel {
 		}
 		return values_strings;
 	}
+	
+	public abstract void displayQuery() throws IOException, JSONException, NumberFormatException;
+	
+	public abstract void clearPanel();
 	
 	/**
 	 * this method returns the minimum value over the last 10 minutes
