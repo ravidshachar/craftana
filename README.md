@@ -23,5 +23,5 @@ Craftana also exports some basic metrics such as:
 Docker:
 -------
 ```
-docker run -it -p 25565:25565 -p 25566:25566 --name craftana_server ravidshachar/craftana:0.1.0
-```
+docker run -it -p 25565:25565 -p 25566:25566 --name craftana_server ravidshachar/craftana:0.3.0
+```  
