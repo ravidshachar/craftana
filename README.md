@@ -2,7 +2,8 @@ Craftana
 =========
 
 This project makes metrics visualisation with prometheus possible in minecraft!  
-  
+![demo](https://i.imgur.com/VkbUiq3.gif)
+
 Commands:  
 ---------
 * /sethistogram \<Histogram ID\> \<Prometheus address\> \<min value\> \<max value\> \<PromQL Query\>
