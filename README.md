@@ -2,7 +2,8 @@ Craftana
 =========
 
 This project makes metrics visualisation with prometheus possible in minecraft!  
-![demo](https://i.imgur.com/VkbUiq3.gif)
+  
+<img src="https://i.imgur.com/VkbUiq3.gif" width="1000"/>
 
 Commands:  
 ---------
