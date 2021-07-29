@@ -38,7 +38,7 @@ integration-test:
       alias: craftana
   script:
     - pip install --upgrade pip
-    - pip install requests
-    - python integration_test.py craftana 300
+    - pip install requests pytest
+    - python -m pytest --address craftana --timeout 300
   dependencies:
     - build-job
