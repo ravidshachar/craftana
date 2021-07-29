@@ -3,11 +3,12 @@ import unittest
 import requests
 import socket
 import sys
+import time
 
 ADDR = sys.argv[1]
 SERVER_PORT = 25565
 EXPORTER_PORT = 25566
-TIMEOUT = sys.argv[2]
+TIMEOUT = int(sys.argv[2])
 
 class TestCraftana(unittest.TestCase):
   """Tests craftana running and exporter working"""
