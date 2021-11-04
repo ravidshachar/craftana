@@ -1,8 +1,7 @@
 ARG MC_VER=1.17.1
-ARG JAVA_VER=17
 
 # Build Craftbukkit jar
-FROM openjdk:${JAVA_VAR}-alpine AS craftbukkit
+FROM openjdk:17-alpine AS craftbukkit
 
 ARG MC_VER
 WORKDIR /BuildTools
@@ -11,7 +10,7 @@ RUN curl -o BuildTools.jar https://hub.spigotmc.org/jenkins/job/BuildTools/lastS
 RUN java -jar BuildTools.jar --rev ${MC_VER} --compile craftbukkit
 
 # Build craftana plugin
-FROM maven:3-jdk-${JAVA_VAR} AS craftana
+FROM maven:3-jdk-17 AS craftana
 
 WORKDIR /craftana
 COPY craftana .
@@ -19,7 +18,7 @@ RUN mvn clean install -D mc.version=${MC_VER}
 RUN cp target/craftana-*-jar-with-dependencies.jar /craftana.jar
 
 # Setup server
-FROM openjdk:${JAVA_VAR}-alpine
+FROM openjdk:17-alpine
 
 ARG MC_VER
 WORKDIR /mcserver
