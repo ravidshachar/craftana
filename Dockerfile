@@ -12,6 +12,7 @@ RUN java -jar BuildTools.jar --rev ${MC_VER} --compile craftbukkit
 # Build craftana plugin
 FROM maven:3-jdk-17 AS craftana
 
+ARG MC_VAR
 WORKDIR /craftana
 COPY craftana .
 RUN mvn clean install -D mc.version=${MC_VER}
