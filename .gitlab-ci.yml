@@ -38,7 +38,11 @@ integration-test:
       alias: craftana
   script:
     - pip install --upgrade pip
-    - pip install requests
-    - python integration_test.py craftana 300
+    - pip install requests pytest
+    - python -m pytest test/ --address craftana --timeout 300 --junitxml=report.xml
   dependencies:
     - build-job
+  artifacts:
+    when: always
+    reports:
+      junit: report.xml
