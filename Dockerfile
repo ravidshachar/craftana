@@ -1,4 +1,4 @@
-ARG MC_VER=1.16.4
+ARG MC_VER=1.17.1
 
 # Build Craftbukkit jar
 FROM openjdk:14-alpine AS craftbukkit
@@ -14,7 +14,7 @@ FROM maven:3-jdk-14 AS craftana
 
 WORKDIR /craftana
 COPY craftana .
-RUN mvn clean install
+RUN mvn clean install -D mc.version=${MC_VER}
 RUN cp target/craftana-*-jar-with-dependencies.jar /craftana.jar
 
 # Setup server
