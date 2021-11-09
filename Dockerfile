@@ -10,7 +10,7 @@ RUN curl -o BuildTools.jar https://hub.spigotmc.org/jenkins/job/BuildTools/lastS
 RUN java -jar BuildTools.jar --rev ${MC_VER} --compile craftbukkit
 
 # Build craftana plugin
-FROM maven:3-jdk-17 AS craftana
+FROM maven:3-openjdk-17 AS craftana
 
 ARG MC_VAR
 WORKDIR /craftana
