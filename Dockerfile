@@ -15,7 +15,7 @@ FROM maven:3-openjdk-17 AS craftana
 ARG MC_VAR
 WORKDIR /craftana
 COPY craftana .
-RUN mvn clean install -D mc.version=${MC_VER}
+RUN mvn clean install
 RUN cp target/craftana-*-jar-with-dependencies.jar /craftana.jar
 
 # Setup server
